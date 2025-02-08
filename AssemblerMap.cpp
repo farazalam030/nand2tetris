@@ -8,42 +8,51 @@
 
 using namespace std;
 
-int AssemblerMap::getCompBinaryCode(string computeInstr) {
+uint32_t AssemblerMap::getCompBinaryCode(string computeInstr) {
   if (AssembleCompMap.find(computeInstr) != AssembleCompMap.end()) {
     return AssembleCompMap[computeInstr];
   } else {
-    cout << "No Instruction like " << computeInstr << endl;
-    exit(-1);
+    return INVALID_INSTR;
   }
 }
 
-int AssemblerMap::getDestBinaryCode(string dest) {
+uint32_t AssemblerMap::getDestBinaryCode(string dest) {
   if (AssembleDestMap.find(dest) != AssembleDestMap.end()) {
     return AssembleDestMap[dest];
   } else {
-    cout << "No Destination like " << dest << endl;
-    exit(-1);
+    return INVALID_INSTR;
   }
 }
 
-int AssemblerMap::getJumpBinaryCode(string jumpInstr) {
+uint32_t AssemblerMap::getJumpBinaryCode(string jumpInstr) {
   if (AssembleJumpMap.find(jumpInstr) != AssembleJumpMap.end()) {
     return AssembleJumpMap[jumpInstr];
   } else {
-    cout << "No Jump Instr supported like " << jumpInstr << endl;
-    exit(-1);
+    return INVALID_INSTR;
   }
 }
 
+uint32_t AssemblerMap::getDefaultBinaryCode(string defaultInstr) {
+  if (AssembleDefaultSymbolsMap.find(defaultInstr) !=
+      AssembleDefaultSymbolsMap.end()) {
+    return AssembleDefaultSymbolsMap[defaultInstr];
+  } else {
+    return INVALID_INSTR;
+  }
+}
 
 int main(int argc, char const *argv[]) {
   AssemblerMap asMap;
 
   string searchText = "M|D";
 
-  int a = asMap.getCompBinaryCode(searchText);
+  uint32_t a = asMap.getCompBinaryCode(searchText);
 
   cout << ((bitset<16>(a << 6 | 0x7 << 13))) << endl;
+
+  a = asMap.getDefaultBinaryCode("R12");
+
+  cout << ((bitset<16>(a))) << endl;
 
   return 0;
 }
