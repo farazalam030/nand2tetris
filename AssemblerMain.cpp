@@ -1,6 +1,7 @@
 #include "AssemblerMap.h"
 #include "Parser.h"
 #include "SymbolTable.h"
+#include "flags.h"
 #include <bitset>
 #include <fstream>
 using namespace std;
@@ -70,9 +71,8 @@ int main(int argc, char const *argv[]) {
       instructionReg = instructionReg & 0x0;
       if (assemblySrc.getSymbolMnemonic().find_first_not_of("0123456789") ==
           string::npos) {
-        instructionReg =
-            instructionReg |
-            (bitset<15>(stoull(assemblySrc.getSymbolMnemonic(), nullptr)));
+        instructionReg = instructionReg |
+                         ((stoull(assemblySrc.getSymbolMnemonic(), nullptr)));
         fout << bitset<16>(instructionReg).to_string();
       } else {
         if (!symbolTable.isPresent(assemblySrc.getSymbolMnemonic())) {
@@ -97,25 +97,26 @@ int main(int argc, char const *argv[]) {
       instructionReg = instructionReg | 0xE000;
       int tmp = asmMap.getCompBinaryCode(assemblySrc.getcompMnemonic());
       ;
-      if (tmp != INVALID)
+      if (tmp != ERROR)
         instructionReg = instructionReg | (tmp << COMPSHIFT);
       else {
-        cout << "Error at line" << lineNumberSource << endl;
+        cout << "1 Error at line " << lineNumberSource << endl;
         exit(ERROR);
       }
+
       tmp = asmMap.getDestBinaryCode(assemblySrc.getDestMnemonic());
 
-      if (tmp != INVALID)
+      if (ERROR != tmp)
         instructionReg = instructionReg | (tmp << DEST_SHIFT);
       else {
-        cout << "Error at line" << lineNumberSource << endl;
+        cout << "2 Error at line " << lineNumberSource << endl;
         exit(ERROR);
       }
       tmp = asmMap.getJumpBinaryCode(assemblySrc.getJumpMnemonic());
-      if (tmp != INVALID)
+      if (tmp != ERROR)
         instructionReg = instructionReg | (tmp << JMP_SHIFT);
       else {
-        cout << "Error at line" << lineNumberSource << endl;
+        cout << "3 Error at line " << lineNumberSource << endl;
         exit(ERROR);
       }
       fout << bitset<16>(instructionReg).to_string();

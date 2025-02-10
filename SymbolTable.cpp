@@ -11,7 +11,7 @@ bool SymbolTable::isPresent(string symbol) {
 }
 
 int SymbolTable::getAddressOfSymbol(string symbol) {
-  if (SymbolAddressTable.find(symbol) != SymbolAddressTable.end();)
+  if (SymbolAddressTable.find(symbol) != SymbolAddressTable.end())
     return SymbolAddressTable[symbol];
   else
     return NOTPRESENT;
