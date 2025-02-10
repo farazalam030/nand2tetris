@@ -1,8 +1,7 @@
 #include <iostream>
-// #include <bits/stdc++.h>
 #include <string>
 #include <unordered_map>
-#define INVALID_INSTR 0xffff0000;
+
 using namespace std;
 
 class AssemblerMap {
