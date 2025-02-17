@@ -94,7 +94,7 @@ int main(int argc, char const *argv[]) {
     }
 
     else if (assemblySrc.commandType(lineNumberSource) == 'C') {
-      instructionReg = instructionReg | 0xE000;
+      instructionReg = instructionReg | 0xE000; // setting 3 MSB's to 111 ;
       int tmp = asmMap.getCompBinaryCode(assemblySrc.getcompMnemonic());
       ;
       if (tmp != ERROR)
