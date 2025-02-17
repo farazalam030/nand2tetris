@@ -14,8 +14,8 @@ int AssemblerMap::getCompBinaryCode(string computeInstr) {
 
 int AssemblerMap::getDestBinaryCode(string dest) {
   // cout << "dest = " << dest << endl;
-  if (dest.empty())
-    return 0;
+  // if (dest.empty())
+  //   return 0;
   if (AssembleDestMap.find(dest) != AssembleDestMap.end()) {
     return AssembleDestMap[dest];
   } else {
@@ -25,8 +25,8 @@ int AssemblerMap::getDestBinaryCode(string dest) {
 
 int AssemblerMap::getJumpBinaryCode(string jumpInstr) {
   // cout << "JMP Instr = " << jumpInstr << endl;
-  if (jumpInstr.empty())
-    return 0;
+  // if (jumpInstr.empty())
+  //   return 0;
   if (AssembleJumpMap.find(jumpInstr) != AssembleJumpMap.end()) {
     return AssembleJumpMap[jumpInstr];
   } else {
