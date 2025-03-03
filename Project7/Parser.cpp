@@ -49,3 +49,95 @@ void Parser::removeWhitespace(string &line)
     if (charsEnd != string::npos)
         line.erase(charsEnd + 1);
 }
+
+void Parser::advance()
+{
+    if (hasMoreCommands())
+    {
+        getline(vmFile, currLine);
+        removeWhitespace(currLine);
+        if (currLine.length() == 0)
+        {
+            advance();
+        }
+        if (currLine.length() > 0)
+            currCommandType = commandType();
+    }
+    else
+    {
+        currCommandType = Command::NONE;
+        cout << "Reached end of file." << endl;
+    }
+}
+
+Command Parser::commandType()
+{
+    const string commandString = currLine.substr(0, currLine.find_first_of(" "));
+    if (arithCommands.find(commandString) != arithCommands.end())
+    {
+        return Command::C_ARITHMETIC;
+    }
+
+    auto foundCommand = commandMap.find(commandString);
+    if (foundCommand != commandMap.end())
+    {
+        return foundCommand->second;
+    }
+
+    else
+    {
+        cout << "Command " << commandString << " not found." << endl;
+        return Command::NONE;
+    }
+}
+
+string Parser::arg1()
+{
+    auto firstSpace = currLine.find_first_of(" ");
+    auto lastSpace = currLine.find_last_of(" ");
+    if (firstSpace != string::npos)
+    {
+        return currLine.substr(firstSpace + 1, lastSpace - firstSpace - 1);
+    }
+    else
+        return currLine;
+}
+
+bool is_number(const std::string &s)
+{
+    // Note: does not work for UTF-8 strings
+    std::string::const_iterator it = s.begin();
+    while (it != s.end() && std::isdigit(*it))
+        ++it;
+    return !s.empty() && it == s.end();
+    // return !s.empty() && std::all_of(s.begin(), s.end(), ::isdigit);
+}
+
+const int Parser::arg2()
+{
+    if (currCommandType == Command::C_PUSH || currCommandType == Command::C_POP || currCommandType == Command::C_FUNCTION || currCommandType == Command::C_CALL)
+    {
+        string arg2String = currLine.substr(currLine.find_last_of(" ") + 1);
+        if (is_number(arg2String)) // it's either this or use a try/catch block
+            return stoi(arg2String);
+    }
+    return NAN;
+}
+
+string &Parser::getCurrLine()
+{
+    return currLine;
+}
+
+void Parser::close()
+{
+    if (vmFile.is_open())
+    {
+        vmFile.close();
+        cout << "===============" << endl;
+    }
+}
+
+Parser::~Parser()
+{
+}
