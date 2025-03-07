@@ -133,18 +133,7 @@ string CodeWriter::popGenerator(const string &segment, int index) {
   if (segment == "local" || segment == "argument" || segment == "this" ||
       segment == "that" || segment == "temp") {
 
-    string seg; //
-                // if (segment == "local")
-                //   seg = LCL;
-                // else if (segment == "argument")
-                //   seg = "ARG";
-                // else if (segment == "this")
-                //   seg = "THIS";
-                // else if (segment == "that")
-                //   seg = "THAT";
-                // else if (segment == "temp")
-                //   seg = "TEMP";
-
+    string seg = getMemorySection(segment);
 #ifdef DEBUG
     cout << "Inside PopGenerator" << endl;
     cout << "segment: " << segment << " idx: " << idx << endl;
@@ -222,7 +211,13 @@ string CodeWriter::arithmeticComparisonGenerator(const string &command) {
   string trueLabel = "TRUE" + to_string(labelCounter);
   string falseLabel = "FALSE" + to_string(labelCounter);
   labelCounter++;
-  jmp = "J" + toupper(command);
+  if (command == "eq")
+    jmp = "JEQ";
+  else if (command == "lt")
+    jmp = "JLT";
+  else if (command == "gt")
+    jmp = "JGT";
+
   asmCode += decrementVariable(SP); // SP--
   asmCode += "A=M\n";               // A=*SP
   asmCode += "D=M\n";               // D=*A
