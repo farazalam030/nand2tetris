@@ -80,7 +80,7 @@ string CodeWriter::getMemorySection(const string &segment) {
   else if (segment == "that")
     seg = "THAT";
   else if (segment == "temp")
-    seg = "TEMP";
+    seg = "5";
 
   return seg;
 }
