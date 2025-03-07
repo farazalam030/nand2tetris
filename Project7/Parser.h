@@ -5,37 +5,28 @@ using namespace std;
 class Parser
 {
 private:
-    bool failedOpen = false;
-
-    ifstream vmFile;
-    string currLine;
-    // set<string> calledFunctions;
+  ifstream vmFile;
+  string currentCommand, cmd, arg1, arg2;
 
 public:
-    Parser(const string &filename)
-    {
-        vmFile.open(filename);
-        int numFunctions = 0;
-        if (vmFile.is_open())
-        {
-            cout << "Opened file " << filename << endl;
-        }
-        else
-        {
-            cout << "Error opening file " << filename << " for parsing" << endl;
-            failedOpen = true;
-        }
-    }
+  Command commandType = Command::NONE;
 
-    bool getFailedOpen();
-    bool hasMoreCommands();
-    void advance();
-    Command commandType();
-    Command currCommandType = Command::NONE;
-    string arg1();
-    const int arg2();
-    string &getCurrLine();
-    void close();
-    void removeWhitespace(string &line);
-    ~Parser();
+  Parser(const string &filename);
+  bool hasMoreCommands();
+  string advance();
+  Command getCommandType();
+
+  string argument1();
+  int argument2();
+
+  // HELPER Functions
+  void setCmdArguments();
+  string getCmd();
+  string getArg1();
+  int getArg2();
+  /*TODO HELPER Functions*/
+  //   string &getCurrLine();
+  //   void close();
+  void removeWhitespace(string &line);
+  ~Parser();
 };
