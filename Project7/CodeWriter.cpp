@@ -3,21 +3,41 @@
 constexpr int TEMP_START = 5;
 using namespace std;
 
-CodeWriter::CodeWriter(const string &basefileName)
-    : baseFileName(basefileName), labelCounter(0) {
+CodeWriter::CodeWriter(const string &filename)
+    : currentVmFile(filename), labelCounter(0) {
 
-  asmFile = ofstream(baseFileName + ".asm");
+  baseFileName = currentVmFile.substr(currentVmFile.find_last_of('/') + 1);
+  baseFileName = baseFileName.substr(0, baseFileName.find_last_of('.') - 0);
+
+  asmfileName =
+      currentVmFile.substr(0, currentVmFile.find_last_of('.')) + ".asm";
+  asmFile = ofstream(asmfileName);
   if (!asmFile.is_open()) {
-    cout << "Error opening file " << baseFileName << ".asm" << endl;
+    cout << "Error opening file " << asmfileName << endl;
   } else {
-    cout << "File " << baseFileName << ".asm" << " opened successfully."
-         << endl;
+    cout << "File " << asmfileName << " opened successfully." << endl;
   }
+  putCommentVMFileName(baseFileName);
 }
+#ifdef DEBUG
+void CodeWriter::printDebugInfo() {
+  cout << "currentVmFile: " << currentVmFile << endl;
+  cout << "baseFileName: " << baseFileName << endl;
+  cout << "labelCounter: " << labelCounter << endl;
+  cout << "asmFile: " << asmFile.is_open() << endl;
+  cout << "asmfileName: " << asmfileName << endl;
+}
+#endif // DEBUG
 
-void CodeWriter::setInputVmFileName(const string &filename) {
-  currentVmFile = filename;
-  string str = "\n//*************** " + filename + "started ***************\n";
+void CodeWriter::putCommentVMFileName(const string &filename) {
+// currentVmFile = filename;
+#ifdef DEBUG
+  cout << "Inside putCommentVMFileName" << endl;
+  printDebugInfo();
+#endif // DEBUG
+
+  string str =
+      "\n//*************** " + filename + ".vm started ***************\n";
   asmFile << str;
 }
 
@@ -55,7 +75,7 @@ void CodeWriter::writePushPop(const string &command, const string &segment,
 }
 void CodeWriter::close() {
   string str =
-      "\n//*************** " + currentVmFile + " ended ***************\n";
+      "\n//*************** " + baseFileName + ".vm ended ***************\n";
   str += "(END)\n@END\n0;JMP\n";
   asmFile << str;
   asmFile.close();
@@ -111,8 +131,14 @@ string CodeWriter::pushGenerator(const string &segment, int index) {
 
   // push static idx -> [*SP=filename.idx, SP++]
   else {
-    string staticVar =
-        currentVmFile.substr(0, currentVmFile.find_last_of(".")) + "." + idx;
+
+    string staticVar = baseFileName + "." + idx;
+#ifdef DEBUG
+    cout << "Inside PushGenerator" << endl;
+    cout << baseFileName << " " << idx << endl;
+    cout << "staticVar: " << staticVar << endl;
+#endif // DEBUG
+
     asmCode += variable_to_pointer(SP, staticVar); // SP--
     asmCode += incrementVariable(SP);
   }
@@ -154,7 +180,7 @@ string CodeWriter::popGenerator(const string &segment, int index) {
   }
 
   else {
-    string staticVar = currentVmFile + "." + idx;
+    string staticVar = baseFileName + "." + idx;
     // SP--
     asmCode += decrementVariable(SP);
     // filename.idx = *SP

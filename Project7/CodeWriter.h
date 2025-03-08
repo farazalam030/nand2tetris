@@ -21,14 +21,15 @@ private:
 
 public:
   CodeWriter(const string &filename);
-  void setInputVmFileName(const string &filename);
+  void putCommentVMFileName(const string &filename);
   void writeArithmetic(const string &command);
   void writePushPop(const string &command, const string &segment, int index);
   void close(); // close output file
 
   ~CodeWriter();
-  void setDbg(bool dbg);
-
+#ifdef DEBUG
+  void printDebugInfo();
+#endif // DEBUG
   string pushGenerator(const string &segment, int index);
   string popGenerator(const string &segment, int index);
   string arithmeticLogicalGenerator(const string &command);
