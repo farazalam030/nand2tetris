@@ -15,7 +15,7 @@ int main(int argc, char const *argv[]) {
   string baseFileName = inputVmFile.substr(0, inputVmFile.find_last_of('.'));
   // string outputAsmFile = baseFileName + ".asm";
   CodeWriter codeWriter(baseFileName);
-  string staticVar = baseFileName.substr(baseFileName.find_last_of('/') + 1);
+  string staticVar = inputVmFile.substr(baseFileName.find_last_of('/') + 1);
   codeWriter.setInputVmFileName(staticVar);
 
   Parser parser(inputVmFile);
