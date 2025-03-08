@@ -38,6 +38,12 @@ Parser::Parser(const string &filename) {
   } else {
     cout << "File " << filename << " opened successfully." << endl;
   }
+
+  cmd = "";
+  arg1 = "";
+  arg2 = "";
+  currentCommand = "";
+  commandType = Command::NONE;
 }
 
 bool Parser::hasMoreCommands() { return vmFile.peek() != EOF; }
@@ -77,6 +83,10 @@ void Parser::setCmdArguments() {
   cmd = words[0];
   arg1 = words[1];
   arg2 = words[2];
+#ifdef DEBUG
+  cout << "In Parser.cpp cmd: " << cmd << " arg1: " << arg1 << " arg2: " << arg2
+       << endl;
+#endif // DEBUG
 }
 
 Command Parser::getCommandType() {

@@ -33,7 +33,7 @@ public:
     NONE
   };
   unordered_map<string, Segment> segmentEnumMap;
-  unordered_map<string, string> jumpMaps;
+
 
   CodeWriter(const string &filename);
   void setInputVmFileName(const string &filename);

@@ -171,6 +171,7 @@ string CodeWriter::popGenerator(const string &segment, int index) {
   return asmCode;
 }
 
+////////////////////////// Helper Functions //////////////////////////
 string CodeWriter::arithmeticLogicalGenerator(const string &command) {
   string asmCode = "";
   asmCode += decrementVariable(SP); // SP--
@@ -181,7 +182,8 @@ string CodeWriter::arithmeticLogicalGenerator(const string &command) {
   if (command == "add") {
     asmCode += "D=D+M\n"; // D=D+*A
   } else if (command == "sub") {
-    asmCode += "D=M-D\n"; // D=*A-D
+    asmCode += "D=D-M\n"; // D=*A-D
+    asmCode += "D=-D\n";  // D=-D
   } else if (command == "and") {
     asmCode += "D=D&M\n"; // D=D&M
   } else if (command == "or") {
@@ -192,14 +194,17 @@ string CodeWriter::arithmeticLogicalGenerator(const string &command) {
   asmCode += incrementVariable(SP); // SP++
   return asmCode;
 }
+
 string CodeWriter::arithmeticNegNotGenerator(const string &command) {
   string asmCode = "";
   asmCode += decrementVariable(SP); // SP--
   asmCode += "A=M\n";               // A=*SP
+  asmCode += "D=M\n";               // D=*A
   if (command == "neg") {
-    asmCode += "M=-M\n"; // *A=-*A
+    asmCode += "M=-D\n"; // *A=-*A
+
   } else if (command == "not") {
-    asmCode += "M=!M\n"; // *A=!*A
+    asmCode += "M=!D\n"; // *A=!*A
   }
   asmCode += incrementVariable(SP); // SP++
   return asmCode;
@@ -254,7 +259,7 @@ string CodeWriter::variable_to_pointer(string ptr, string variable) {
   string code = "";
   // *SP = foo.i
   code += "@" + variable + "\n"; // A=variable
-  code += "D=M\n";               // D=*A
+  code += "D=M\n";               // D=M
   code += "@" + ptr + "\n";      // A=ptr
   code += "A=M\n";               // A=*ptr
   code += "M=D\n";               // *ptr=*A
@@ -301,17 +306,14 @@ string CodeWriter::ithSegment(string destination, string segment, string idx) {
   cout << "destination: " << destination << " segment: " << segment
        << " idx: " << idx << endl;
 #endif                          // DEBUG
-  code += "@" + idx + "\n";     // D=*A
+  code += "@" + idx + "\n";
   code += "D=A\n";              // D=idx
   code += "@" + segment + "\n"; // A=LCL
 
-  switch (segmentEnumMap[segment]) {
-  case Segment::TEMP:
+  if (segment == "5") {
     code += "D=D+A\n"; // D=idx+5
-    break;
-  default:
+  } else {
     code += "D=D+M\n"; // D=idx+*A
-    break;
   }
   code += "@" + destination + "\n";
   code += "M=D\n";
