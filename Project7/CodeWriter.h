@@ -8,7 +8,6 @@ const string ARG = "ARG";
 const string THIS = "THIS";
 const string THAT = "THAT";
 const string TEMP = "5";
-
 const string addr = "addr";
 
 class CodeWriter {
@@ -21,20 +20,6 @@ private:
   int labelCounter;
 
 public:
-  enum Segment {
-    CONST = 0,
-    ARG,
-    LOCAL,
-    STATIC,
-    THIS,
-    THAT,
-    POINTER,
-    TEMP,
-    NONE
-  };
-  unordered_map<string, Segment> segmentEnumMap;
-
-
   CodeWriter(const string &filename);
   void setInputVmFileName(const string &filename);
   void writeArithmetic(const string &command);

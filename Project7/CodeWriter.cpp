@@ -6,18 +6,6 @@ using namespace std;
 CodeWriter::CodeWriter(const string &basefileName)
     : baseFileName(basefileName), labelCounter(0) {
 
-  unordered_map<string, Segment> segmentEnumMap = {
-      {"local", Segment::LOCAL},
-      {"this", Segment::THIS},
-      {"that", Segment::THAT},
-      {"argument", Segment::ARG},
-      {"constant", Segment::CONST},
-      {"static", Segment::STATIC},
-      {"pointer", Segment::POINTER},
-      {"temp", Segment::TEMP}
-
-  };
-
   asmFile = ofstream(baseFileName + ".asm");
   if (!asmFile.is_open()) {
     cout << "Error opening file " << baseFileName << ".asm" << endl;
@@ -76,17 +64,16 @@ void CodeWriter::close() {
 
 string CodeWriter::getMemorySection(const string &segment) {
   string seg;
-  if (segment == "local")
+  if (segment.compare("local") == 0)
     seg = "LCL";
-  else if (segment == "argument")
+  else if (segment.compare("argument") == 0)
     seg = "ARG";
-  else if (segment == "this")
+  else if (segment.compare("this") == 0)
     seg = "THIS";
-  else if (segment == "that")
+  else if (segment.compare("that") == 0)
     seg = "THAT";
-  else if (segment == "temp")
+  else if (segment.compare("temp") == 0)
     seg = "5";
-
   return seg;
 }
 
@@ -124,7 +111,8 @@ string CodeWriter::pushGenerator(const string &segment, int index) {
 
   // push static idx -> [*SP=filename.idx, SP++]
   else {
-    string staticVar = currentVmFile + "." + idx;
+    string staticVar =
+        currentVmFile.substr(0, currentVmFile.find_last_of(".")) + "." + idx;
     asmCode += variable_to_pointer(SP, staticVar); // SP--
     asmCode += incrementVariable(SP);
   }
@@ -143,7 +131,6 @@ string CodeWriter::popGenerator(const string &segment, int index) {
     cout << "Inside PopGenerator" << endl;
     cout << "segment: " << segment << " idx: " << idx << endl;
     cout << "seg: " << seg << endl;
-    cout << "segEnum: " << (segmentEnumMap[segment]) << endl;
 #endif // DEBUG
     // addr = segment + idx
     asmCode += ithSegment(addr, seg, idx);

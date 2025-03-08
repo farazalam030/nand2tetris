@@ -24,8 +24,6 @@ int main(int argc, char const *argv[]) {
     string currentCommand = parser.advance();
     int cmd = parser.getCommandType();
     // cmd = C_ARITHMETIC;
-    cout << "Line: " << lineNumber << " Command: " << currentCommand
-         << " Command Type: " << cmd << endl;
     if (cmd == C_ARITHMETIC) {
       codeWriter.writeArithmetic(parser.argument1());
     } else if (cmd == C_PUSH || cmd == C_POP) {
