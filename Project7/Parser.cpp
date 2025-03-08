@@ -25,11 +25,9 @@ std::string trim(const std::string &s) { return ltrim(rtrim(s)); }
 static const set<string> arithCommands = {"add", "sub", "neg", "eq", "gt",
                                           "lt",  "and", "or",  "not"};
 static const unordered_map<string, Command> commandMap = {
-    {"pop", Command::C_POP},           {"push", Command::C_PUSH},
-    {"if-goto", Command::C_IF},        {"goto", Command::C_GOTO},
-    {"function", Command::C_FUNCTION}, {"call", Command::C_CALL},
-    {"return", Command::C_RETURN},     {"label", Command::C_LABEL},
-    {"//", Command::COMMENT}};
+    {"pop", C_POP},       {"push", C_PUSH},         {"if-goto", C_IF},
+    {"goto", C_GOTO},     {"function", C_FUNCTION}, {"call", C_CALL},
+    {"return", C_RETURN}, {"label", C_LABEL},       {"//", COMMENT}};
 
 Parser::Parser(const string &filename) {
   vmFile.open(filename);
@@ -43,7 +41,7 @@ Parser::Parser(const string &filename) {
   arg1 = "";
   arg2 = "";
   currentCommand = "";
-  commandType = Command::NONE;
+  commandType = NONE;
 }
 
 bool Parser::hasMoreCommands() { return vmFile.peek() != EOF; }
@@ -62,7 +60,7 @@ string Parser::advance() {
     if (currentCommand.length() > 0)
       commandType = getCommandType();
   } else {
-    commandType = Command::NONE;
+    commandType = NONE;
     cout << "Reached end of file." << endl;
   }
   return currentCommand;
@@ -89,24 +87,34 @@ void Parser::setCmdArguments() {
 #endif // DEBUG
 }
 
-Command Parser::getCommandType() {
+int Parser::getCommandType() {
+#ifdef DEBUG
+  cout << "In Parser.cpp getCommandType currentCommand: " << currentCommand
+       << endl;
+#endif // DEBUG
+  currentCommand = trim(currentCommand);
   if (currentCommand[0] == '/' && currentCommand[1] == '/') {
-    return Command::COMMENT;
+    return COMMENT;
   }
-  if (arithCommands.find(currentCommand) != arithCommands.end()) {
-    return Command::C_ARITHMETIC;
+  if (currentCommand.compare("add") == 0 ||
+      currentCommand.compare("sub") == 0 ||
+      currentCommand.compare("neg") == 0 || currentCommand.compare("eq") == 0 ||
+      currentCommand.compare("gt") == 0 || currentCommand.compare("lt") == 0 ||
+      currentCommand.compare("and") == 0 || currentCommand.compare("or") == 0 ||
+      currentCommand.compare("not") == 0) {
+    return C_ARITHMETIC;
   }
   if (currentCommand.find("push") != string::npos) {
-    return Command::C_PUSH;
+    return C_PUSH;
   }
   if (currentCommand.find("pop") != string::npos) {
-    return Command::C_POP;
+    return C_POP;
   }
-  return Command::NONE;
+  return NONE;
 }
 
 string Parser::argument1() {
-  if (commandType == Command::C_ARITHMETIC) {
+  if (commandType == C_ARITHMETIC) {
     return cmd;
   }
   return arg1;

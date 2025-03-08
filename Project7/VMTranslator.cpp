@@ -21,10 +21,13 @@ int main(int argc, char const *argv[]) {
   int lineNumber = 0;
   while (parser.hasMoreCommands()) {
     string currentCommand = parser.advance();
-    Command cmd = parser.getCommandType();
-    if (cmd == Command::C_ARITHMETIC) {
+    int cmd = parser.getCommandType();
+    // cmd = C_ARITHMETIC;
+    cout << "Line: " << lineNumber << " Command: " << currentCommand
+         << " Command Type: " << cmd << endl;
+    if (cmd == C_ARITHMETIC) {
       codeWriter.writeArithmetic(parser.argument1());
-    } else if (cmd == Command::C_PUSH || cmd == Command::C_POP) {
+    } else if (cmd == C_PUSH || cmd == C_POP) {
       codeWriter.writePushPop(parser.getCmd(), parser.getArg1(),
                               parser.getArg2());
     }

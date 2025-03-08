@@ -2,19 +2,31 @@
 #include "CommonShared.h"
 using namespace std;
 
-class Parser
-{
+const int C_ARITHMETIC = 11;
+const int C_PUSH = 1;
+const int C_POP = 2;
+const int C_LABEL = 3;
+const int C_GOTO = 4;
+const int C_IF = 5;
+const int C_FUNCTION = 6;
+const int C_RETURN = 7;
+const int C_CALL = 8;
+const int COMMENT = 9;
+const int C_BLANK = 10;
+const int NONE = 0;
+
+class Parser {
 private:
   ifstream vmFile;
   string currentCommand, cmd, arg1, arg2;
 
 public:
-  Command commandType = Command::NONE;
+  int commandType;
 
   Parser(const string &filename);
   bool hasMoreCommands();
   string advance();
-  Command getCommandType();
+  int getCommandType();
 
   string argument1();
   int argument2();

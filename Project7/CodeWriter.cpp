@@ -36,8 +36,12 @@ void CodeWriter::setInputVmFileName(const string &filename) {
 void CodeWriter::writeArithmetic(const string &command) {
   string asmCode = "";
   asmCode += "// " + command + "\n";
-  if (command == "add" || command == "sub" || command == "and" ||
-      command == "or") {
+#ifdef DEBUG
+  cout << "Inside writeArithmetic" << endl;
+  cout << "command: " << command << endl;
+#endif // DEBUG
+  if (command.compare("add") == 0 || command.compare("sub") == 0 ||
+      command.compare("and") == 0 || command.compare("or") == 0) {
     asmCode += arithmeticLogicalGenerator(command);
   } else if (command == "neg" || command == "not") {
     asmCode += arithmeticNegNotGenerator(command);
@@ -46,6 +50,7 @@ void CodeWriter::writeArithmetic(const string &command) {
   } else {
     cout << "Invalid arithmetic command: " << command << endl;
   }
+  asmFile << asmCode;
 }
 
 void CodeWriter::writePushPop(const string &command, const string &segment,
