@@ -24,7 +24,7 @@ std::string trim(const std::string &s) { return ltrim(rtrim(s)); }
 
 static const set<string> arithCommands = {"add", "sub", "neg", "eq", "gt",
                                           "lt",  "and", "or",  "not"};
-static const unordered_map<string, Command> commandMap = {
+static const unordered_map<string, int> commandMap = {
     {"pop", C_POP},       {"push", C_PUSH},         {"if-goto", C_IF},
     {"goto", C_GOTO},     {"function", C_FUNCTION}, {"call", C_CALL},
     {"return", C_RETURN}, {"label", C_LABEL},       {"//", COMMENT}};
