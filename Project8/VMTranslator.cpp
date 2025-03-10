@@ -25,7 +25,21 @@ int main(int argc, char const *argv[]) {
     } else if (cmd == C_PUSH || cmd == C_POP) {
       codeWriter.writePushPop(parser.getCmd(), parser.getArg1(),
                               parser.getArg2());
+    } else if (cmd == C_LABEL) {
+      codeWriter.writeLabel(parser.getArg1());
+    } else if (cmd == C_GOTO) {
+      codeWriter.writeGoto(parser.getArg1());
+    } else if (cmd == C_IF) {
+      codeWriter.writeIf(parser.getArg1());
     }
+    //  else if (cmd == C_FUNCTION) {
+    //   codeWriter.writeFunction(parser.getArg1(), parser.getArg2());
+    // } else if (cmd == C_RETURN) {
+    //   codeWriter.writeReturn();
+    // } else if (cmd == C_CALL) {
+    //   codeWriter.writeCall(parser.getArg1(), parser.getArg2());
+    // }
+
     lineNumber++;
   }
 

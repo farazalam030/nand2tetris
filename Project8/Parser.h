@@ -11,7 +11,7 @@ const int C_IF = 5;
 const int C_FUNCTION = 6;
 const int C_RETURN = 7;
 const int C_CALL = 8;
-const int COMMENT = 9;
+const int C_COMMENT = 9;
 const int C_BLANK = 10;
 const int NONE = 0;
 

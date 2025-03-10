@@ -73,6 +73,22 @@ void CodeWriter::writePushPop(const string &command, const string &segment,
   }
   asmFile << asmCode;
 }
+
+void CodeWriter::writeLabel(const string &label) {
+  string asmCode = labelGenerator(label);
+  asmFile << asmCode;
+}
+
+void CodeWriter::writeGoto(const string &label) {
+  string asmCode = gotoGenerator(label);
+  asmFile << asmCode;
+}
+
+void CodeWriter::writeIf(const string &label) {
+  string asmCode = ifGenerator(label);
+  asmFile << asmCode;
+}
+
 void CodeWriter::close() {
   string str =
       "\n//*************** " + baseFileName + ".vm ended ***************\n";
@@ -342,4 +358,25 @@ CodeWriter::~CodeWriter() {
   if (asmFile.is_open()) {
     asmFile.close();
   }
+}
+
+string CodeWriter::labelGenerator(const string &label) {
+  string code = "// ---- label" + label + " ---  //\n";
+  code += "(" + label + ")\n";
+  return code;
+}
+string CodeWriter::gotoGenerator(const string &label) {
+  string code = "// ---- goto" + label + " ---  //\n";
+  code += "@" + label + "\n";
+  code += "0;JMP\n";
+  return code;
+}
+string CodeWriter::ifGenerator(const string &label) {
+  string code = "// ---- if-goto" + label + " ---  //\n";
+  code += decrementVariable(SP);
+  code += "A=M\n";
+  code += "D=M\n";
+  code += "@" + label + "\n";
+  code += "D;JNE\n";
+  return code;
 }

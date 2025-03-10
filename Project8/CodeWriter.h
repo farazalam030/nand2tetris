@@ -24,6 +24,12 @@ public:
   void putCommentVMFileName(const string &filename);
   void writeArithmetic(const string &command);
   void writePushPop(const string &command, const string &segment, int index);
+  void writeLabel(const string &label);
+  void writeGoto(const string &label);
+  void writeIf(const string &label);
+  void writeCall(const string &functionName, int numArgs);
+  void writeReturn();
+  void writeFunction(const string &functionName, int numLocals);
   void close(); // close output file
 
   ~CodeWriter();
@@ -32,6 +38,13 @@ public:
 #endif // DEBUG
   string pushGenerator(const string &segment, int index);
   string popGenerator(const string &segment, int index);
+  string labelGenerator(const string &label);
+  string gotoGenerator(const string &label);
+  string ifGenerator(const string &label);
+  string callGenerator(const string &functionName, int numArgs);
+  string returnGenerator();
+  string functionGenerator(const string &functionName, int numLocals);
+
   string arithmeticLogicalGenerator(const string &command);
   string arithmeticNegNotGenerator(const string &command);
   string arithmeticComparisonGenerator(const string &command);

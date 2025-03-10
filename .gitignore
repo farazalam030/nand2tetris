@@ -28,7 +28,6 @@
 
 # Executables
 *.exe
-*.out
 *.app
 *.i*86
 *.x86_64
@@ -36,11 +35,9 @@
 *.asm
 *.bin
 *.elf
-*.tst
 *.test
 *.msi
 *.o
-*.cmp
 *.vscode*
 *.vscode
 *.vscode/*

@@ -68,6 +68,12 @@ void Parser::setCmdArguments() {
     if (token.length() == 0) {
       continue;
     }
+    if (token[0] == '/' && token[1] == '/') {
+      if (words[0].length() == 0) {
+        words[0] = "COMMENT";
+        break;
+      }
+    }
     words[i] = token;
     i++;
   }
@@ -87,7 +93,7 @@ int Parser::getCommandType() {
 #endif // DEBUG
   currentCommand = trim(currentCommand);
   if (currentCommand[0] == '/' && currentCommand[1] == '/') {
-    return COMMENT;
+    return C_COMMENT;
   }
   if (currentCommand.compare("add") == 0 ||
       currentCommand.compare("sub") == 0 ||
@@ -96,12 +102,24 @@ int Parser::getCommandType() {
       currentCommand.compare("and") == 0 || currentCommand.compare("or") == 0 ||
       currentCommand.compare("not") == 0) {
     return C_ARITHMETIC;
-  }
-  if (currentCommand.find("push") != string::npos) {
+  } else if (currentCommand.find("push") != string::npos) {
     return C_PUSH;
-  }
-  if (currentCommand.find("pop") != string::npos) {
+  } else if (currentCommand.find("pop") != string::npos) {
     return C_POP;
+  } else if (currentCommand.find("label") != string::npos) {
+    return C_LABEL;
+  } else if (currentCommand.find("if-goto") != string::npos) {
+    return C_IF;
+  } else if (currentCommand.find("goto") != string::npos) {
+    return C_GOTO;
+  } else if (currentCommand.find("function") != string::npos) {
+    return C_FUNCTION;
+  } else if (currentCommand.find("return") != string::npos) {
+    return C_RETURN;
+  } else if (currentCommand.find("call") != string::npos) {
+    return C_CALL;
+  } else if (currentCommand.length() == 0) {
+    return C_BLANK;
   }
   return NONE;
 }
