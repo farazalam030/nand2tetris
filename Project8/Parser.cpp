@@ -61,7 +61,22 @@ string Parser::advance() {
 
 void Parser::setCmdArguments() {
   string token = "";
+  if (currentCommand.find("//") != string::npos) {
+    currentCommand = currentCommand.substr(0, currentCommand.find("//"));
+  }
+#ifdef DEBUG
+  cout << "In Parser.cpp setCmdArguments currentCommand: before trim "
+       << currentCommand << endl;
+#endif // DEBUG
+
+  currentCommand = trim(currentCommand);
+
+#ifdef DEBUG
+  cout << "In Parser.cpp setCmdArguments currentCommand: after trim"
+       << currentCommand << endl;
+#endif // DEBUG
   stringstream tokens(currentCommand);
+
   int i = 0;
   string words[3] = {"", "", ""};
   while (tokens >> token) {
@@ -91,7 +106,7 @@ int Parser::getCommandType() {
   cout << "In Parser.cpp getCommandType currentCommand: " << currentCommand
        << endl;
 #endif // DEBUG
-  currentCommand = trim(currentCommand);
+
   if (currentCommand[0] == '/' && currentCommand[1] == '/') {
     return C_COMMENT;
   }
