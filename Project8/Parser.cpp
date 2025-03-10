@@ -72,7 +72,7 @@ void Parser::setCmdArguments() {
   currentCommand = trim(currentCommand);
 
 #ifdef DEBUG
-  cout << "In Parser.cpp setCmdArguments currentCommand: after trim"
+  cout << "In Parser.cpp setCmdArguments currentCommand: after trim : "
        << currentCommand << endl;
 #endif // DEBUG
   stringstream tokens(currentCommand);
