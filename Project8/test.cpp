@@ -13,12 +13,13 @@ int main(int argc, char const *argv[]) {
 
   cout << "Hello World" << endl;
 
-  string filePath = argc > 1 ? fs::absolute(argv[1]) : "";
+  string filePath = argv[1];
   cout << "filePath: " << filePath << endl;
   string sysFilePath = "";
   string inputVMFilePath = "";
   vector<string> vmFiles;
-  if (fs::is_directory(filePath)) {
+
+  if (fs::is_directory(fs::absolute(filePath))) {
     try {
 
       for (auto &entry : fs::directory_iterator(filePath)) {
@@ -39,6 +40,12 @@ int main(int argc, char const *argv[]) {
   cout << "sysFilePath: " << sysFilePath << endl;
   cout << "inputVMFilePath: " << inputVMFilePath << endl;
 
+  string outASMFilePath =
+      sysFilePath.substr(sysFilePath.find_first_of('/') + 1,
+                         sysFilePath.find_last_of("/") -
+                             sysFilePath.find_first_of('/') - 1) +
+      ".asm";
+  cout << "outASMFilePath: " << outASMFilePath << endl;
   printVector(vmFiles);
 
   return 0;
