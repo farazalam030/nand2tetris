@@ -37,6 +37,15 @@ public:
   string getArg1();
   int getArg2();
 
+  void setVmFile(const string &fName) {
+    vmFile.close();
+    vmFile.clear();
+    vmFile.open(fName);
+#ifdef DEBUG
+    cout << __FILE__ << ":" << __LINE__ << " ";
+    cout << "Parsing : " << fName << endl;
+#endif // DEBUG
+  }
   void removeWhitespace(string &line);
   ~Parser();
 };

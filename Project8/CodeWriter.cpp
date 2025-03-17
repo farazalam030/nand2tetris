@@ -3,20 +3,50 @@
 constexpr int TEMP_START = 5;
 using namespace std;
 
-CodeWriter::CodeWriter(const string &filename)
-    : currentVmFile(filename), labelCounter(0) {
+CodeWriter::CodeWriter(const string &filename, const bool &isMultiVM = false,
+                       const bool &SysInitNeeded = false) {
+  labelCounter = 0;
+  returnLabelCounter = 0;
+  isMultipleVMs = isMultiVM;
+  sysInitNeeded = SysInitNeeded;
+  currentVmFile = filename;
+  if (!isMultipleVMs) {
+#ifdef DEBUG
+    cout << "In " << __FILE__ << " " << __LINE__ << endl;
+    cout << " currentVMFile: " << currentVmFile << endl;
 
-  baseFileName = currentVmFile.substr(currentVmFile.find_last_of('/') + 1);
-  baseFileName = baseFileName.substr(0, baseFileName.find_last_of('.') - 0);
+#endif // DEBUG
+    baseFileName = currentVmFile.substr(currentVmFile.find_last_of('/') + 1);
+    baseFileName = baseFileName.substr(0, baseFileName.find_last_of('.') - 0);
+    asmfileName =
+        currentVmFile.substr(0, currentVmFile.find_last_of('.')) + ".asm";
+  } else {
 
-  asmfileName =
-      currentVmFile.substr(0, currentVmFile.find_last_of('.')) + ".asm";
+    baseFileName =
+        currentVmFile.substr(currentVmFile.find_last_of('/') + 1, string::npos);
+    // baseFileName = baseFileName.substr(0, baseFileName.find_last_of('.') -
+    // 0);
+    asmfileName =
+        currentVmFile.substr(0, currentVmFile.find_last_of('.')) + ".asm";
+#ifdef DEBUG
+    cout << "In " << __FILE__ << " " << __LINE__ << endl;
+    cout << " currentVMFile: " << currentVmFile << endl;
+    cout << " baseFileName: " << baseFileName << endl;
+
+#endif // DEBUG
+  }
+
   asmFile = ofstream(asmfileName);
   if (!asmFile.is_open()) {
     cout << "Error opening file " << asmfileName << endl;
   } else {
     cout << "File " << asmfileName << " opened successfully." << endl;
   }
+  if (sysInitNeeded) {
+    string init = generateSysInit();
+    asmFile << init;
+  }
+
   putCommentVMFileName(baseFileName);
 
 #ifdef DEBUG
@@ -33,6 +63,12 @@ void CodeWriter::printDebugInfo() {
   cout << "isMultipleVMs: " << isMultipleVMs << endl;
 }
 #endif // DEBUG
+
+void CodeWriter::setisMultipleVMs(bool val) { isMultipleVMs = val; }
+bool CodeWriter::getisMultipleVMs() { return isMultipleVMs; }
+
+void CodeWriter::setsysInitNeeded(bool val) { sysInitNeeded = val; }
+bool CodeWriter::getsysInitNeeded() { return sysInitNeeded; }
 
 void CodeWriter::putCommentVMFileName(const string &filename) {
 // currentVmFile = filename;
@@ -151,8 +187,8 @@ string CodeWriter::pushGenerator(const string &segment, int index) {
 
     string seg = getMemorySection(segment);
 
-    asmCode += ithSegment(addr, seg, idx);              // addr = SEgment + idx
-    asmCode += pointer_to_pointer(SP, addr);            // *SP = *addr
+    asmCode += ithSegment(addr, seg, idx);   // addr = SEgment + idx
+    asmCode += pointer_to_pointer(SP, addr); // *SP = *addr
     asmCode += incrementVariable(SP);
   }
 
@@ -300,7 +336,6 @@ string CodeWriter::arithmeticComparisonGenerator(const string &command) {
   asmCode += incrementVariable(SP); // SP++
   return asmCode;
 }
-string CodeWriter::getBaseFileName() { return baseFileName; }
 
 string CodeWriter::idx_to_ptr(string ptr, string idx) {
   string code = "";
@@ -362,7 +397,7 @@ string CodeWriter::ithSegment(string destination, string segment, string idx) {
 #ifdef DEBUG
   cout << "destination: " << destination << " segment: " << segment
        << " idx: " << idx << endl;
-#endif                          // DEBUG
+#endif // DEBUG
   code += "@" + idx + "\n";
   code += "D=A\n";              // D=idx
   code += "@" + segment + "\n"; // A=LCL
@@ -524,5 +559,81 @@ string CodeWriter::returnGenerator() {
   code += "//goto RET\n";
   code += "@" + RET + "\n";
   code += "A=M\n";
+  return code;
+}
+
+string CodeWriter::generateSysInit() {
+  string code = "//______ PROGRAM INIT ________";
+  code += "@256\n";
+  code += "D=A\n";
+  code += "@SP\n";
+  code += "M=D\n"; // SP = 256
+
+  code += "@1\n";
+  code += "D=A\n";
+  code += "@LCL\n";
+  code += "M=D\n"; // SP = 256
+
+  code += "@2\n";
+  code += "D=A\n";
+  code += "@ARG\n";
+  code += "M=D\n"; // SP = 256
+
+  code += "@3\n";
+  code += "D=A\n";
+  code += "@THIS\n";
+  code += "M=D\n"; // SP = 256
+
+  code += "@4\n";
+  code += "D=A\n";
+  code += "@THAT\n";
+  code += "M=D\n"; // SP = 256
+
+  code += "@bootstrap\n";
+  code += "D=A\n";
+  code += "@SP\n";
+  code += "A=M\n";
+  code += "M=D\n";
+  code += "@SP\n";
+  code += "M=M+1\n";
+
+  code += "@LCL\n";
+  code += "D=M\n";
+  code += "@SP\n";
+  code += "A=M\n";
+  code += "M=D\n";
+  code += "@SP\n";
+  code += "M=M+1\n";
+
+  code += "@ARG\n";
+  code += "D=M\n";
+  code += "@SP\n";
+  code += "A=M\n";
+  code += "M=D\n";
+  code += "@SP\n";
+  code += "M=M+1\n";
+
+  code += "@THIS\n";
+  code += "D=M\n";
+  code += "@SP\n";
+  code += "A=M\n";
+  code += "M=D\n";
+  code += "@SP\n";
+  code += "M=M+1\n";
+
+  code += "@THAT\n";
+  code += "D=M\n";
+  code += "@SP\n";
+  code += "A=M\n";
+  code += "M=D\n";
+  code += "@SP\n";
+  code += "M=M+1\n";
+
+  code += "@5\nD=A\n@SP\nD=M-D\n@ARG\nM=D\n"; // n=0 and ARG = SP -n-5;
+
+  code += "@SP\nD=M\n@LCL\nM=D\n"; //  LCL = SP
+  code += "@Sys.init\n0;JMP\n(bootstrap)\n";
+  code += callGenerator("Sys.init", 0);
+
   return code;
 }

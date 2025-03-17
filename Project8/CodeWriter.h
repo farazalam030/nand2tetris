@@ -23,9 +23,22 @@ private:
 
 public:
   bool isMultipleVMs;
-  CodeWriter(const string &filename);
+  bool sysInitNeeded;
+  void setcurrentVmFile(const string &currentVMFile) {
+    currentVmFile = currentVMFile;
+  }
+  string getcurrentVmFile() { return currentVmFile; }
+  void setBaseFileName(const string &baseFile) { baseFileName = baseFile; }
+  string getBaseFileName() { return baseFileName; }
+  void setAsmFileName(const string &asmFileName) { asmfileName = asmFileName; }
+  string getAsmFileName() { return asmfileName; }
+
+  CodeWriter(const string &filename, const bool &isMultiVM,
+             const bool &SysInitNeeded);
   void setisMultipleVMs(bool val);
   bool getisMultipleVMs();
+  void setsysInitNeeded(bool val);
+  bool getsysInitNeeded();
   void putCommentVMFileName(const string &filename);
   void writeArithmetic(const string &command);
   void writePushPop(const string &command, const string &segment, int index);
@@ -53,7 +66,6 @@ public:
   string arithmeticLogicalGenerator(const string &command);
   string arithmeticNegNotGenerator(const string &command);
   string arithmeticComparisonGenerator(const string &command);
-  string getBaseFileName();
 
   // HELPER Functions
   string idx_to_ptr(string ptr, string idx);               // *SP=idx
@@ -65,4 +77,6 @@ public:
   string ithSegment(string destination, string segment,
                     string idx); // segment+i
   string getMemorySection(const string &segment);
+
+  string generateSysInit();
 };
