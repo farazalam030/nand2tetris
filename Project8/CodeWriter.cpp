@@ -4,13 +4,15 @@ constexpr int TEMP_START = 5;
 using namespace std;
 
 CodeWriter::CodeWriter(const string &filename, const bool &isMultiVM = false,
-                       const bool &SysInitNeeded = false) {
+                       const bool &SysInitNeeded = false)
+{
   labelCounter = 0;
   returnLabelCounter = 0;
   isMultipleVMs = isMultiVM;
   sysInitNeeded = SysInitNeeded;
   currentVmFile = filename;
-  if (!isMultipleVMs) {
+  if (!isMultipleVMs)
+  {
 #ifdef DEBUG
     cout << "In " << __FILE__ << " " << __LINE__ << endl;
     cout << " currentVMFile: " << currentVmFile << endl;
@@ -20,7 +22,9 @@ CodeWriter::CodeWriter(const string &filename, const bool &isMultiVM = false,
     baseFileName = baseFileName.substr(0, baseFileName.find_last_of('.') - 0);
     asmfileName =
         currentVmFile.substr(0, currentVmFile.find_last_of('.')) + ".asm";
-  } else {
+  }
+  else
+  {
 
     baseFileName =
         currentVmFile.substr(currentVmFile.find_last_of('/') + 1, string::npos);
@@ -37,12 +41,16 @@ CodeWriter::CodeWriter(const string &filename, const bool &isMultiVM = false,
   }
 
   asmFile = ofstream(asmfileName);
-  if (!asmFile.is_open()) {
+  if (!asmFile.is_open())
+  {
     cout << "Error opening file " << asmfileName << endl;
-  } else {
+  }
+  else
+  {
     cout << "File " << asmfileName << " opened successfully." << endl;
   }
-  if (sysInitNeeded) {
+  if (sysInitNeeded)
+  {
     string init = generateSysInit();
     asmFile << init;
   }
@@ -54,7 +62,8 @@ CodeWriter::CodeWriter(const string &filename, const bool &isMultiVM = false,
 #endif // DEBUG
 }
 #ifdef DEBUG
-void CodeWriter::printDebugInfo() {
+void CodeWriter::printDebugInfo()
+{
   cout << "currentVmFile: " << currentVmFile << endl;
   cout << "baseFileName: " << baseFileName << endl;
   cout << "labelCounter: " << labelCounter << endl;
@@ -70,7 +79,8 @@ bool CodeWriter::getisMultipleVMs() { return isMultipleVMs; }
 void CodeWriter::setsysInitNeeded(bool val) { sysInitNeeded = val; }
 bool CodeWriter::getsysInitNeeded() { return sysInitNeeded; }
 
-void CodeWriter::putCommentVMFileName(const string &filename) {
+void CodeWriter::putCommentVMFileName(const string &filename)
+{
 // currentVmFile = filename;
 #ifdef DEBUG
   cout << "Inside putCommentVMFileName" << endl;
@@ -82,7 +92,8 @@ void CodeWriter::putCommentVMFileName(const string &filename) {
   asmFile << str;
 }
 
-void CodeWriter::writeArithmetic(const string &command) {
+void CodeWriter::writeArithmetic(const string &command)
+{
   string asmCode = "";
   asmCode += "// " + command + "\n";
 #ifdef DEBUG
@@ -90,65 +101,85 @@ void CodeWriter::writeArithmetic(const string &command) {
   cout << "command: " << command << endl;
 #endif // DEBUG
   if (command.compare("add") == 0 || command.compare("sub") == 0 ||
-      command.compare("and") == 0 || command.compare("or") == 0) {
+      command.compare("and") == 0 || command.compare("or") == 0)
+  {
     asmCode += arithmeticLogicalGenerator(command);
-  } else if (command == "neg" || command == "not") {
+  }
+  else if (command == "neg" || command == "not")
+  {
     asmCode += arithmeticNegNotGenerator(command);
-  } else if (command == "eq" || command == "gt" || command == "lt") {
+  }
+  else if (command == "eq" || command == "gt" || command == "lt")
+  {
     asmCode += arithmeticComparisonGenerator(command);
-  } else {
+  }
+  else
+  {
     cout << "Invalid arithmetic command: " << command << endl;
   }
   asmFile << asmCode;
 }
 
 void CodeWriter::writePushPop(const string &command, const string &segment,
-                              int index) {
+                              int index)
+{
   string asmCode = "";
-  if (command == "push") {
+  if (command == "push")
+  {
     asmCode += pushGenerator(segment, index);
-  } else if (command == "pop") {
+  }
+  else if (command == "pop")
+  {
     asmCode += popGenerator(segment, index);
-  } else {
+  }
+  else
+  {
     cout << "Invalid push/pop command: " << command << endl;
   }
   asmFile << asmCode;
 }
 
-void CodeWriter::writeLabel(const string &label) {
+void CodeWriter::writeLabel(const string &label)
+{
   string tmp = currFunc + ":" + label;
   string asmCode = labelGenerator(tmp);
   asmFile << asmCode;
 }
 
-void CodeWriter::writeGoto(const string &label) {
+void CodeWriter::writeGoto(const string &label)
+{
   string tmp = currFunc + ":" + label;
   string asmCode = gotoGenerator(tmp);
   asmFile << asmCode;
 }
 
-void CodeWriter::writeIf(const string &label) {
+void CodeWriter::writeIf(const string &label)
+{
   string tmp = currFunc + ":" + label;
   string asmCode = ifGenerator(tmp);
   asmFile << asmCode;
 }
 
-void CodeWriter::writeCall(const string &functionName, int numArgs) {
+void CodeWriter::writeCall(const string &functionName, int numArgs)
+{
   string asmCode = callGenerator(functionName, numArgs);
   asmFile << asmCode;
 }
 
-void CodeWriter::writeReturn() {
+void CodeWriter::writeReturn()
+{
   string asmCode = returnGenerator();
   asmFile << asmCode;
 }
 
-void CodeWriter::writeFunction(const string &functionName, int numLocals) {
+void CodeWriter::writeFunction(const string &functionName, int numLocals)
+{
   string asmCode = functionGenerator(functionName, numLocals);
   asmFile << asmCode;
 }
 
-void CodeWriter::close() {
+void CodeWriter::close()
+{
   string str =
       "\n//*************** " + baseFileName + ".vm ended ***************\n";
   str += "(END)\n@END\n0;JMP\n";
@@ -157,7 +188,8 @@ void CodeWriter::close() {
   asmFile.clear();
 }
 
-string CodeWriter::getMemorySection(const string &segment) {
+string CodeWriter::getMemorySection(const string &segment)
+{
   string seg;
   if (segment.compare("local") == 0)
     seg = "LCL";
@@ -172,18 +204,21 @@ string CodeWriter::getMemorySection(const string &segment) {
   return seg;
 }
 
-string CodeWriter::pushGenerator(const string &segment, int index) {
+string CodeWriter::pushGenerator(const string &segment, int index)
+{
   string idx = to_string(index);
   string asmCode = "// push " + segment + " " + to_string(index) + "\n";
 
-  if (segment == "constant") {
+  if (segment == "constant")
+  {
     // push constant idx ->  [*SP=idx, SP++]
     asmCode += idx_to_ptr(SP, idx);
     asmCode += incrementVariable(SP);
   }
 
   else if (segment == "local" || segment == "argument" || segment == "this" ||
-           segment == "that" || segment == "temp") {
+           segment == "that" || segment == "temp")
+  {
 
     string seg = getMemorySection(segment);
 
@@ -192,11 +227,15 @@ string CodeWriter::pushGenerator(const string &segment, int index) {
     asmCode += incrementVariable(SP);
   }
 
-  else if (segment == "pointer") {
+  else if (segment == "pointer")
+  {
     string th_ptr = "";
-    if (index == 0) {
+    if (index == 0)
+    {
       th_ptr = THIS;
-    } else { // if (idx == "1") {
+    }
+    else
+    { // if (idx == "1") {
       th_ptr = THAT;
     }
     // push pointer idx -> [*SP=THIS/THAT, SP++]
@@ -205,7 +244,8 @@ string CodeWriter::pushGenerator(const string &segment, int index) {
   }
 
   // push static idx -> [*SP=filename.idx, SP++]
-  else {
+  else
+  {
 
     string staticVar = baseFileName + "." + idx;
 #ifdef DEBUG
@@ -221,11 +261,13 @@ string CodeWriter::pushGenerator(const string &segment, int index) {
   return asmCode;
 }
 
-string CodeWriter::popGenerator(const string &segment, int index) {
+string CodeWriter::popGenerator(const string &segment, int index)
+{
   string idx = to_string(index);
   string asmCode = "// pop " + segment + " " + to_string(index) + "\n";
   if (segment == "local" || segment == "argument" || segment == "this" ||
-      segment == "that" || segment == "temp") {
+      segment == "that" || segment == "temp")
+  {
 
     string seg = getMemorySection(segment);
 #ifdef DEBUG
@@ -240,12 +282,16 @@ string CodeWriter::popGenerator(const string &segment, int index) {
 
     // *addr = *SP
     asmCode += pointer_to_pointer(addr, SP);
-
-  } else if (segment == "pointer") {
+  }
+  else if (segment == "pointer")
+  {
     string th_ptr = "";
-    if (index == 0) {
+    if (index == 0)
+    {
       th_ptr = THIS;
-    } else { // if (idx == "1") {
+    }
+    else
+    { // if (idx == "1") {
       th_ptr = THAT;
     }
     // SP--
@@ -254,7 +300,8 @@ string CodeWriter::popGenerator(const string &segment, int index) {
     asmCode += pointer_to_variable(th_ptr, SP);
   }
 
-  else {
+  else
+  {
     string staticVar = baseFileName + "." + idx;
     // SP--
     asmCode += decrementVariable(SP);
@@ -265,21 +312,29 @@ string CodeWriter::popGenerator(const string &segment, int index) {
 }
 
 ////////////////////////// Helper Functions //////////////////////////
-string CodeWriter::arithmeticLogicalGenerator(const string &command) {
+string CodeWriter::arithmeticLogicalGenerator(const string &command)
+{
   string asmCode = "";
   asmCode += decrementVariable(SP); // SP--
   asmCode += "A=M\n";               // A=*SP
   asmCode += "D=M\n";               // D=*A
   asmCode += decrementVariable(SP); // SP--
   asmCode += "A=M\n";               // A=*SP
-  if (command == "add") {
+  if (command == "add")
+  {
     asmCode += "D=D+M\n"; // D=D+*A
-  } else if (command == "sub") {
+  }
+  else if (command == "sub")
+  {
     asmCode += "D=D-M\n"; // D=*A-D
     asmCode += "D=-D\n";  // D=-D
-  } else if (command == "and") {
+  }
+  else if (command == "and")
+  {
     asmCode += "D=D&M\n"; // D=D&M
-  } else if (command == "or") {
+  }
+  else if (command == "or")
+  {
     asmCode += "D=D|M\n"; // D=D|M
   }
 
@@ -288,22 +343,26 @@ string CodeWriter::arithmeticLogicalGenerator(const string &command) {
   return asmCode;
 }
 
-string CodeWriter::arithmeticNegNotGenerator(const string &command) {
+string CodeWriter::arithmeticNegNotGenerator(const string &command)
+{
   string asmCode = "";
   asmCode += decrementVariable(SP); // SP--
   asmCode += "A=M\n";               // A=*SP
   asmCode += "D=M\n";               // D=*A
-  if (command == "neg") {
+  if (command == "neg")
+  {
     asmCode += "M=-D\n"; // *A=-*A
-
-  } else if (command == "not") {
+  }
+  else if (command == "not")
+  {
     asmCode += "M=!D\n"; // *A=!*A
   }
   asmCode += incrementVariable(SP); // SP++
   return asmCode;
 }
 
-string CodeWriter::arithmeticComparisonGenerator(const string &command) {
+string CodeWriter::arithmeticComparisonGenerator(const string &command)
+{
   string asmCode = "";
   string jmp = "";
   string trueLabel = "TRUE" + to_string(labelCounter);
@@ -337,7 +396,8 @@ string CodeWriter::arithmeticComparisonGenerator(const string &command) {
   return asmCode;
 }
 
-string CodeWriter::idx_to_ptr(string ptr, string idx) {
+string CodeWriter::idx_to_ptr(string ptr, string idx)
+{
   string code = "";
   code += "@" + idx + "\n"; // A=idx
   code += "D=A\n";          // D=idx
@@ -347,7 +407,8 @@ string CodeWriter::idx_to_ptr(string ptr, string idx) {
   return code;
 }
 
-string CodeWriter::variable_to_pointer(string ptr, string variable) {
+string CodeWriter::variable_to_pointer(string ptr, string variable)
+{
   string code = "";
   // *SP = foo.i
   code += "@" + variable + "\n"; // A=variable
@@ -357,7 +418,8 @@ string CodeWriter::variable_to_pointer(string ptr, string variable) {
   code += "M=D\n";               // *ptr=*A
   return code;
 }
-string CodeWriter::pointer_to_variable(string variable, string ptr) {
+string CodeWriter::pointer_to_variable(string variable, string ptr)
+{
   string code = "";
   // foo.i = *SP
   code += "@" + ptr + "\n";      // A=ptr
@@ -367,7 +429,8 @@ string CodeWriter::pointer_to_variable(string variable, string ptr) {
   code += "M=D\n";               // M=*ptr
   return code;
 }
-string CodeWriter::pointer_to_pointer(string ptr1, string ptr2) {
+string CodeWriter::pointer_to_pointer(string ptr1, string ptr2)
+{
   string code = "";
   // *ptr2 = *ptr1
   code += "@" + ptr2 + "\n"; // A=ptr2
@@ -378,21 +441,24 @@ string CodeWriter::pointer_to_pointer(string ptr1, string ptr2) {
   code += "M=D\n";           // *ptr1=*ptr2
   return code;
 }
-string CodeWriter::incrementVariable(string variable) {
+string CodeWriter::incrementVariable(string variable)
+{
   string code = "";
   // variable++
   code += "@" + variable + "\n"; // A=variable
   code += "M=M+1\n";             // *A=*A+1
   return code;
 }
-string CodeWriter::decrementVariable(string variable) {
+string CodeWriter::decrementVariable(string variable)
+{
   string code = "";
   // variable--
   code += "@" + variable + "\n"; // A=variable
   code += "M=M-1\n";             // *A=*A-1
   return code;
 }
-string CodeWriter::ithSegment(string destination, string segment, string idx) {
+string CodeWriter::ithSegment(string destination, string segment, string idx)
+{
   string code = "";
 #ifdef DEBUG
   cout << "destination: " << destination << " segment: " << segment
@@ -402,9 +468,12 @@ string CodeWriter::ithSegment(string destination, string segment, string idx) {
   code += "D=A\n";              // D=idx
   code += "@" + segment + "\n"; // A=LCL
 
-  if (segment == "5") {
+  if (segment == "5")
+  {
     code += "D=D+A\n"; // D=idx+5
-  } else {
+  }
+  else
+  {
     code += "D=D+M\n"; // D=idx+*A
   }
   code += "@" + destination + "\n";
@@ -412,24 +481,29 @@ string CodeWriter::ithSegment(string destination, string segment, string idx) {
   return code;
 }
 
-CodeWriter::~CodeWriter() {
-  if (asmFile.is_open()) {
+CodeWriter::~CodeWriter()
+{
+  if (asmFile.is_open())
+  {
     asmFile.close();
   }
 }
 
-string CodeWriter::labelGenerator(const string &label) {
+string CodeWriter::labelGenerator(const string &label)
+{
   string code = "// ---- label" + label + " ---  //\n";
   code += "(" + label + ")\n";
   return code;
 }
-string CodeWriter::gotoGenerator(const string &label) {
+string CodeWriter::gotoGenerator(const string &label)
+{
   string code = "// ---- goto" + label + " ---  //\n";
   code += "@" + label + "\n";
   code += "0;JMP\n";
   return code;
 }
-string CodeWriter::ifGenerator(const string &label) {
+string CodeWriter::ifGenerator(const string &label)
+{
   string code = "// ---- if-goto" + label + " ---  //\n";
   code += decrementVariable(SP);
   code += "A=M\n";
@@ -440,18 +514,21 @@ string CodeWriter::ifGenerator(const string &label) {
 }
 
 string CodeWriter::functionGenerator(const string &functionName,
-                                     int numLocals) {
+                                     int numLocals)
+{
   string code = "// ---- function" + functionName + " " + to_string(numLocals) +
                 "---  //\n";
   currFunc = functionName;
   code += "(" + functionName + ")\n";
-  for (int i = 0; i < numLocals; i++) {
+  for (int i = 0; i < numLocals; i++)
+  {
     code += pushGenerator("constant", 0);
   }
   return code;
 }
 
-string CodeWriter::callGenerator(const string &functionName, int numArgs) {
+string CodeWriter::callGenerator(const string &functionName, int numArgs)
+{
   string code =
       "// ---- call" + functionName + " " + to_string(numArgs) + " ---  //\n";
   string returnAddress = functionName + "$ret." + to_string(returnLabelCounter);
@@ -493,7 +570,8 @@ string CodeWriter::callGenerator(const string &functionName, int numArgs) {
   return code;
 }
 
-string CodeWriter::returnGenerator() {
+string CodeWriter::returnGenerator()
+{
   string code = "// ---- return ---  //\n";
   string FRAME = "R14"; //  TEMP Variable Frame
   string RET = "R13";
@@ -562,8 +640,9 @@ string CodeWriter::returnGenerator() {
   return code;
 }
 
-string CodeWriter::generateSysInit() {
-  string code = "//______ PROGRAM INIT ________";
+string CodeWriter::generateSysInit()
+{
+  string code = "//______ PROGRAM INIT ________\n";
   code += "@256\n";
   code += "D=A\n";
   code += "@SP\n";

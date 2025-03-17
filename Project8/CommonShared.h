@@ -11,5 +11,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <sstream>
 
 #endif // SHARED_H
