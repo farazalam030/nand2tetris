@@ -54,7 +54,7 @@ CodeWriter::CodeWriter(const string &filename, const bool &isMultiVM = false,
     asmFile << init;
   }
 
-  putCommentVMFileName(baseFileName);
+  putCommentVMFileName(currentVmFile);
 
 #ifdef DEBUG
   printDebugInfo();
@@ -182,7 +182,9 @@ void CodeWriter::close()
 {
   string str =
       "\n//*************** " + baseFileName + ".vm ended ***************\n";
-  str += "(END)\n@END\n0;JMP\n";
+  if (!isMultipleVMs) {
+    str += "(END)\n@END\n0;JMP\n";
+  }
   asmFile << str;
   asmFile.close();
   asmFile.clear();
@@ -209,16 +211,15 @@ string CodeWriter::pushGenerator(const string &segment, int index)
   string idx = to_string(index);
   string asmCode = "// push " + segment + " " + to_string(index) + "\n";
 
-  if (segment == "constant")
-  {
+  if (segment.compare("constant") == 0) {
     // push constant idx ->  [*SP=idx, SP++]
     asmCode += idx_to_ptr(SP, idx);
     asmCode += incrementVariable(SP);
   }
 
-  else if (segment == "local" || segment == "argument" || segment == "this" ||
-           segment == "that" || segment == "temp")
-  {
+  else if (segment.compare("local") == 0 || segment.compare("argument") == 0 ||
+           segment.compare("this") == 0 || segment.compare("that") == 0 ||
+           segment.compare("temp") == 0) {
 
     string seg = getMemorySection(segment);
 
@@ -227,8 +228,7 @@ string CodeWriter::pushGenerator(const string &segment, int index)
     asmCode += incrementVariable(SP);
   }
 
-  else if (segment == "pointer")
-  {
+  else if (segment == "pointer") {
     string th_ptr = "";
     if (index == 0)
     {
@@ -244,8 +244,7 @@ string CodeWriter::pushGenerator(const string &segment, int index)
   }
 
   // push static idx -> [*SP=filename.idx, SP++]
-  else
-  {
+  else {
 
     string staticVar = baseFileName + "." + idx;
 #ifdef DEBUG
@@ -316,29 +315,29 @@ string CodeWriter::arithmeticLogicalGenerator(const string &command)
 {
   string asmCode = "";
   asmCode += decrementVariable(SP); // SP--
-  asmCode += "A=M\n";               // A=*SP
-  asmCode += "D=M\n";               // D=*A
+  asmCode += "A = M\n";             // A=*SP
+  asmCode += "D = M\n";             // D=*A
   asmCode += decrementVariable(SP); // SP--
-  asmCode += "A=M\n";               // A=*SP
+  asmCode += "A = M\n";             // A=*SP
   if (command == "add")
   {
-    asmCode += "D=D+M\n"; // D=D+*A
+    asmCode += "D = D + M\n"; // D = D+*A
   }
   else if (command == "sub")
   {
-    asmCode += "D=D-M\n"; // D=*A-D
-    asmCode += "D=-D\n";  // D=-D
+    asmCode += "D = D-M\n"; // D=*A-D
+    asmCode += "D = -D\n";  // D = -D
   }
   else if (command == "and")
   {
-    asmCode += "D=D&M\n"; // D=D&M
+    asmCode += "D = D&M\n"; // D = D&M
   }
   else if (command == "or")
   {
-    asmCode += "D=D|M\n"; // D=D|M
+    asmCode += "D = D|M\n"; // D = D|M
   }
 
-  asmCode += "M=D\n";               // *A=D
+  asmCode += "M = D\n";             // *A = D
   asmCode += incrementVariable(SP); // SP++
   return asmCode;
 }
@@ -347,8 +346,8 @@ string CodeWriter::arithmeticNegNotGenerator(const string &command)
 {
   string asmCode = "";
   asmCode += decrementVariable(SP); // SP--
-  asmCode += "A=M\n";               // A=*SP
-  asmCode += "D=M\n";               // D=*A
+  asmCode += "A = M\n";             // A=*SP
+  asmCode += "D = M\n";             // D=*A
   if (command == "neg")
   {
     asmCode += "M=-D\n"; // *A=-*A
@@ -376,22 +375,22 @@ string CodeWriter::arithmeticComparisonGenerator(const string &command)
     jmp = "JGT";
 
   asmCode += decrementVariable(SP); // SP--
-  asmCode += "A=M\n";               // A=*SP
-  asmCode += "D=M\n";               // D=*A
+  asmCode += "A = M\n";             // A=*SP
+  asmCode += "D = M\n";             // D=*A
   asmCode += decrementVariable(SP); // SP--
-  asmCode += "A=M\n";               // A=*SP
-  asmCode += "D=M-D\n";             // D=*A-D
+  asmCode += "A = M\n";             // A=*SP
+  asmCode += "D = M - D\n";         // D=*A-D
   asmCode += "@" + trueLabel + "\n";
   asmCode += "D;" + jmp + "\n"; // D;jmp trueLabel
-  asmCode += "D=0\n";           // D=0
+  asmCode += "D = 0\n";         // D = 0
   asmCode += "@" + falseLabel + "\n";
   asmCode += "0;JMP\n"; // 0;JMP falseLabel
   asmCode += "(" + trueLabel + ")\n";
-  asmCode += "D=-1\n"; // D=-1
+  asmCode += "D = -1\n"; // D = -1
   asmCode += "(" + falseLabel + ")\n";
   asmCode += "@SP\n";               // A=SP
-  asmCode += "A=M\n";               // A=*SP
-  asmCode += "M=D\n";               // *A=D
+  asmCode += "A = M\n";             // A=*SP
+  asmCode += "M = D\n";             // *A = D
   asmCode += incrementVariable(SP); // SP++
   return asmCode;
 }
@@ -400,10 +399,10 @@ string CodeWriter::idx_to_ptr(string ptr, string idx)
 {
   string code = "";
   code += "@" + idx + "\n"; // A=idx
-  code += "D=A\n";          // D=idx
+  code += "D = A\n";        // D=idx
   code += "@" + ptr + "\n"; // A=ptr
-  code += "A=M\n";          // A=*ptr
-  code += "M=D\n";          // *ptr=idx
+  code += "A = M\n";        // A=*ptr
+  code += "M = D\n";        // *ptr=idx
   return code;
 }
 
@@ -412,10 +411,10 @@ string CodeWriter::variable_to_pointer(string ptr, string variable)
   string code = "";
   // *SP = foo.i
   code += "@" + variable + "\n"; // A=variable
-  code += "D=M\n";               // D=M
+  code += "D = M\n";             // D = M
   code += "@" + ptr + "\n";      // A=ptr
-  code += "A=M\n";               // A=*ptr
-  code += "M=D\n";               // *ptr=*A
+  code += "A = M\n";             // A=*ptr
+  code += "M = D\n";             // *ptr=*A
   return code;
 }
 string CodeWriter::pointer_to_variable(string variable, string ptr)
@@ -423,10 +422,10 @@ string CodeWriter::pointer_to_variable(string variable, string ptr)
   string code = "";
   // foo.i = *SP
   code += "@" + ptr + "\n";      // A=ptr
-  code += "A=M\n";               // A=*ptr
-  code += "D=M\n";               // D=*A
+  code += "A = M\n";             // A=*ptr
+  code += "D = M\n";             // D=*A
   code += "@" + variable + "\n"; // A=ptr
-  code += "M=D\n";               // M=*ptr
+  code += "M = D\n";             // M=*ptr
   return code;
 }
 string CodeWriter::pointer_to_pointer(string ptr1, string ptr2)
@@ -434,11 +433,11 @@ string CodeWriter::pointer_to_pointer(string ptr1, string ptr2)
   string code = "";
   // *ptr2 = *ptr1
   code += "@" + ptr2 + "\n"; // A=ptr2
-  code += "A=M\n";           // A=*ptr2
-  code += "D=M\n";           // D=*A
+  code += "A = M\n";         // A=*ptr2
+  code += "D = M\n";         // D=*A
   code += "@" + ptr1 + "\n"; // A=ptr1
-  code += "A=M\n";           // A=*ptr1
-  code += "M=D\n";           // *ptr1=*ptr2
+  code += "A = M\n";         // A=*ptr1
+  code += "M = D\n";         // *ptr1=*ptr2
   return code;
 }
 string CodeWriter::incrementVariable(string variable)
@@ -446,7 +445,7 @@ string CodeWriter::incrementVariable(string variable)
   string code = "";
   // variable++
   code += "@" + variable + "\n"; // A=variable
-  code += "M=M+1\n";             // *A=*A+1
+  code += "M = M + 1\n";         // *A=*A+1
   return code;
 }
 string CodeWriter::decrementVariable(string variable)
@@ -454,7 +453,7 @@ string CodeWriter::decrementVariable(string variable)
   string code = "";
   // variable--
   code += "@" + variable + "\n"; // A=variable
-  code += "M=M-1\n";             // *A=*A-1
+  code += "M = M - 1\n";         // *A=*A-1
   return code;
 }
 string CodeWriter::ithSegment(string destination, string segment, string idx)
@@ -465,19 +464,19 @@ string CodeWriter::ithSegment(string destination, string segment, string idx)
        << " idx: " << idx << endl;
 #endif // DEBUG
   code += "@" + idx + "\n";
-  code += "D=A\n";              // D=idx
+  code += "D = A\n";            // D=idx
   code += "@" + segment + "\n"; // A=LCL
 
   if (segment == "5")
   {
-    code += "D=D+A\n"; // D=idx+5
+    code += "D = D + A\n"; // D=idx+5
   }
   else
   {
-    code += "D=D+M\n"; // D=idx+*A
+    code += "D = D + M\n"; // D=idx+*A
   }
   code += "@" + destination + "\n";
-  code += "M=D\n";
+  code += "M = D\n";
   return code;
 }
 
@@ -506,8 +505,8 @@ string CodeWriter::ifGenerator(const string &label)
 {
   string code = "// ---- if-goto" + label + " ---  //\n";
   code += decrementVariable(SP);
-  code += "A=M\n";
-  code += "D=M\n";
+  code += "A = M\n";
+  code += "D = M\n";
   code += "@" + label + "\n";
   code += "D;JNE\n";
   return code;
@@ -516,13 +515,18 @@ string CodeWriter::ifGenerator(const string &label)
 string CodeWriter::functionGenerator(const string &functionName,
                                      int numLocals)
 {
-  string code = "// ---- function" + functionName + " " + to_string(numLocals) +
-                "---  //\n";
+  string code = "// ---- function " + functionName + " " +
+                to_string(numLocals) + "---  //\n";
   currFunc = functionName;
   code += "(" + functionName + ")\n";
   for (int i = 0; i < numLocals; i++)
   {
-    code += pushGenerator("constant", 0);
+    code += "@0 \n";         // A=idx
+    code += "D = A\n";       // D=idx
+    code += "@" + SP + "\n"; // A=ptr
+    code += "A = M\n";       // A=*ptr
+    code += "M = D\n";       // *ptr=idx
+    code += incrementVariable(SP);
   }
   return code;
 }
@@ -530,7 +534,7 @@ string CodeWriter::functionGenerator(const string &functionName,
 string CodeWriter::callGenerator(const string &functionName, int numArgs)
 {
   string code =
-      "// ---- call" + functionName + " " + to_string(numArgs) + " ---  //\n";
+      "// ---- call " + functionName + " " + to_string(numArgs) + " ---  //\n";
   string returnAddress = functionName + "$ret." + to_string(returnLabelCounter);
   returnLabelCounter++;
   code += "// push return-address\n";
@@ -550,19 +554,20 @@ string CodeWriter::callGenerator(const string &functionName, int numArgs)
   code += incrementVariable(SP);
   code += "// ARG = SP - numArgs - 5\n";
   code += "@" + to_string(numArgs) + "\n";
-  code += "D=A\n";
+  code += "D = A\n";
   code += "@5\n";
-  code += "D=D+A\n"; // n+5
+  code += "D = D + A\n"; // n+5
   code += "@" + SP + "\n";
-  code += "D=M-D\n"; // SP-n-5
+  code += "D = D - M\n"; // n+5-SP
+  code += "D = -D\n";    // SP -n -5
   code += "@" + ARG + "\n";
-  code += "M=D\n"; // ARG=SP-n-5
+  code += "M = D\n"; // ARG=SP-n-5
   code += "// LCL = SP\n";
   code += "@" + SP + "\n";
-  code += "D=M\n";
+  code += "D = M\n";
   code += "@" + LCL + "\n";
-  code += "M=D\n";
-  code += "// goto f\n";
+  code += "M = D\n";
+  code += "// goto " + functionName + "\n";
   code += "@" + functionName + "\n";
   code += "0;JMP\n";
   code += "//(" + returnAddress + ")\n";
@@ -578,65 +583,65 @@ string CodeWriter::returnGenerator()
 
   code += "// Frame = LCL\n";
   code += "@" + LCL + "\n";
-  code += "D=M\n";
+  code += "D = M\n";
   code += "@" + FRAME + "\n";
-  code += "M=D\n";
+  code += "M = D\n";
   code += "// retAddr = *(FRAME - 5)\n";
   code += "@5\n";
-  code += "D=A\n";
+  code += "D = A\n";
   code += "@" + FRAME + "\n";
-  code += "A=M-D\n";
-  code += "D=M\n";
+  code += "A = M - D\n";
+  code += "D = M\n";
   code += "@" + RET + "\n";
-  code += "M=D\n";
+  code += "M = D\n";
   code += "// *ARG = pop()\n";
   code += "@SP\n";
-  code += "AM=M-1";
-  code += "D=M"; // D= M[SP] // pop ()
+  code += "AM = M - 1";
+  code += "D = M"; // D= M[SP] // pop ()
   code += "@ARG\n";
-  code += "A=M\n";
-  code += "M=D\n"; // *ARG = pop()
+  code += "A = M\n";
+  code += "M = D\n"; // *ARG = pop()
   code += "// SP = ARG + 1\n";
   code += "@" + ARG + "\n";
-  code += "D=M+1\n";
+  code += "D = M + 1\n";
   code += "@" + SP + "\n";
-  code += "M=D\n";
+  code += "M = D\n";
 
   code += "// THAT = *(FRAME - 1)\n";
   code += "@" + FRAME + "\n";
-  code += "A=M-1\n";
-  code += "D=M\n";
+  code += "A = M - 1\n";
+  code += "D = M\n";
   code += "@THAT\n ";
-  code += "M=D\n";
+  code += "M = D\n";
   code += "// THIS = *(endFrame - 2)\n";
   code += "@2\n";
-  code += "D=A\n"; // D= 2
+  code += "D = A\n"; // D= 2
   code += "@" + FRAME + "\n";
-  code += "A=M-D\n"; // A = M[FRAME] - 2
-  code += "D=M\n";   // D = * (M[FRAME] - 2)
+  code += "A = M - D\n"; // A = M[FRAME] - 2
+  code += "D = M\n";     // D = * (M[FRAME] - 2)
   code += "@THIS\n";
-  code += "M=D\n"; // THIS = * (M[FRAME] - 2)
+  code += "M = D\n"; // THIS = * (M[FRAME] - 2)
   code += "// ARG = *(FRAME - 3)\n";
   code += "@3\n";
-  code += "D=A\n"; // D = 3
+  code += "D = A\n"; // D = 3
   code += "@" + FRAME + "\n";
-  code += "A=M-D\n"; // A = M[FRAME] - 3
-  code += "D=M\n";   // D = * (M[FRAME] - 3)
+  code += "A = M - D\n"; // A = M[FRAME] - 3
+  code += "D = M\n";     // D = * (M[FRAME] - 3)
   code += "@ARG\n";
-  code += "M=D\n"; // THIS = * (M[FRAME] - 2)
+  code += "M = D\n"; // THIS = * (M[FRAME] - 2)
 
   code += "// LCL = *(FRAME - 4)\n";
   code += "@4\n";
-  code += "D=A\n"; // D = 4
+  code += "D = A\n"; // D = 4
   code += "@" + FRAME + "\n";
-  code += "A=M-D\n"; // A = M[FRAME] - 4
-  code += "D=M\n";   // D = * (M[FRAME] - 4)
+  code += "A = M - D\n"; // A = M[FRAME] - 4
+  code += "D = M\n";     // D = * (M[FRAME] - 4)
   code += "@LCL\n";
-  code += "M=D\n"; // THIS = * (M[FRAME] - 4)
+  code += "M = D\n"; // THIS = * (M[FRAME] - 4)
 
   code += "//goto RET\n";
   code += "@" + RET + "\n";
-  code += "A=M\n";
+  code += "A = M\n";
   return code;
 }
 
@@ -644,74 +649,75 @@ string CodeWriter::generateSysInit()
 {
   string code = "//______ PROGRAM INIT ________\n";
   code += "@256\n";
-  code += "D=A\n";
+  code += "D = A\n";
   code += "@SP\n";
-  code += "M=D\n"; // SP = 256
+  code += "M = D\n"; // SP = 256
 
-  code += "@1\n";
-  code += "D=A\n";
-  code += "@LCL\n";
-  code += "M=D\n"; // SP = 256
+  // code += "@1\n";
+  // code += "D = A\n";
+  // code += "@LCL\n";
+  // code += "M = D\n"; // SP = 256
 
-  code += "@2\n";
-  code += "D=A\n";
+  // code += "@2\n";
+  // code += "D = A\n";
   code += "@ARG\n";
-  code += "M=D\n"; // SP = 256
+  code += "M = D\n"; // SP = 256
 
-  code += "@3\n";
-  code += "D=A\n";
-  code += "@THIS\n";
-  code += "M=D\n"; // SP = 256
+  // code += "@3\n";
+  // code += "D = A\n";
+  // code += "@THIS\n";
+  // code += "M = D\n"; // SP = 256
 
-  code += "@4\n";
-  code += "D=A\n";
-  code += "@THAT\n";
-  code += "M=D\n"; // SP = 256
+  // code += "@4\n";
+  // code += "D = A\n";
+  // code += "@THAT\n";
+  // code += "M = D\n"; // SP = 256
 
-  code += "@bootstrap\n";
-  code += "D=A\n";
-  code += "@SP\n";
-  code += "A=M\n";
-  code += "M=D\n";
-  code += "@SP\n";
-  code += "M=M+1\n";
+  // code += "@bootstrap\n";
+  // code += "D = A\n";
+  // code += "@SP\n";
+  // code += "A = M\n";
+  // code += "M = D\n";
+  // code += "@SP\n";
+  // code += "M = M + 1\n";
 
-  code += "@LCL\n";
-  code += "D=M\n";
-  code += "@SP\n";
-  code += "A=M\n";
-  code += "M=D\n";
-  code += "@SP\n";
-  code += "M=M+1\n";
+  // code += "@LCL\n";
+  // code += "D = M\n";
+  // code += "@SP\n";
+  // code += "A = M\n";
+  // code += "M = D\n";
+  // code += "@SP\n";
+  // code += "M = M + 1\n";
 
-  code += "@ARG\n";
-  code += "D=M\n";
-  code += "@SP\n";
-  code += "A=M\n";
-  code += "M=D\n";
-  code += "@SP\n";
-  code += "M=M+1\n";
+  // code += "@ARG\n";
+  // code += "D = M\n";
+  // code += "@SP\n";
+  // code += "A = M\n";
+  // code += "M = D\n";
+  // code += "@SP\n";
+  // code += "M = M + 1\n";
 
-  code += "@THIS\n";
-  code += "D=M\n";
-  code += "@SP\n";
-  code += "A=M\n";
-  code += "M=D\n";
-  code += "@SP\n";
-  code += "M=M+1\n";
+  // code += "@THIS\n";
+  // code += "D = M\n";
+  // code += "@SP\n";
+  // code += "A = M\n";
+  // code += "M = D\n";
+  // code += "@SP\n";
+  // code += "M = M + 1\n";
 
-  code += "@THAT\n";
-  code += "D=M\n";
-  code += "@SP\n";
-  code += "A=M\n";
-  code += "M=D\n";
-  code += "@SP\n";
-  code += "M=M+1\n";
+  // code += "@THAT\n";
+  // code += "D = M\n";
+  // code += "@SP\n";
+  // code += "A = M\n";
+  // code += "M = D\n";
+  // code += "@SP\n";
+  // code += "M = M + 1\n";
 
-  code += "@5\nD=A\n@SP\nD=M-D\n@ARG\nM=D\n"; // n=0 and ARG = SP -n-5;
+  // code += "@5\nD = A\n@SP\nD = M - D\n@ARG\nM = D\n"; // n=0 and ARG = SP
+  // -n-5;
 
-  code += "@SP\nD=M\n@LCL\nM=D\n"; //  LCL = SP
-  code += "@Sys.init\n0;JMP\n(bootstrap)\n";
+  // code += "@SP\nD = M\n@LCL\nM = D\n"; //  LCL = SP
+  // code += "@Sys.init\n0;JMP\n(bootstrap)\n";
   code += callGenerator("Sys.init", 0);
 
   return code;

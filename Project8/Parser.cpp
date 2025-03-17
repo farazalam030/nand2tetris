@@ -23,7 +23,8 @@ std::string rtrim(const std::string &s) {
 std::string trim(const std::string &s) { return ltrim(rtrim(s)); }
 
 Parser::Parser(const string &filename) {
-  vmFile.open(filename);
+  vmFileName = filename;
+  vmFile.open(vmFileName);
   if (!vmFile.is_open()) {
     cout << "Error opening file " << filename << endl;
   } else {

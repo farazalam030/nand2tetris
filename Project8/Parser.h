@@ -21,6 +21,7 @@ private:
   string currentCommand, cmd, arg1, arg2;
 
 public:
+  string vmFileName;
   int commandType;
 
   Parser(const string &filename);
