@@ -18,9 +18,14 @@ private:
   string currentVmFile;
   string baseFileName;
   int labelCounter;
+  int returnLabelCounter;
+  string currFunc;
 
 public:
+  bool isMultipleVMs;
   CodeWriter(const string &filename);
+  void setisMultipleVMs(bool val);
+  bool getisMultipleVMs();
   void putCommentVMFileName(const string &filename);
   void writeArithmetic(const string &command);
   void writePushPop(const string &command, const string &segment, int index);

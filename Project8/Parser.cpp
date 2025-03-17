@@ -110,28 +110,27 @@ int Parser::getCommandType() {
   if (currentCommand[0] == '/' && currentCommand[1] == '/') {
     return C_COMMENT;
   }
-  if (currentCommand.compare("add") == 0 ||
-      currentCommand.compare("sub") == 0 ||
-      currentCommand.compare("neg") == 0 || currentCommand.compare("eq") == 0 ||
-      currentCommand.compare("gt") == 0 || currentCommand.compare("lt") == 0 ||
-      currentCommand.compare("and") == 0 || currentCommand.compare("or") == 0 ||
-      currentCommand.compare("not") == 0) {
+  if (cmd.compare("add") == 0 || cmd.compare("sub") == 0 ||
+      cmd.compare("neg") == 0 || cmd.compare("eq") == 0 ||
+      cmd.compare("gt") == 0 || cmd.compare("lt") == 0 ||
+      cmd.compare("and") == 0 || cmd.compare("or") == 0 ||
+      cmd.compare("not") == 0) {
     return C_ARITHMETIC;
-  } else if (currentCommand.find("push") != string::npos) {
+  } else if (cmd.compare("push") == 0) {
     return C_PUSH;
-  } else if (currentCommand.find("pop") != string::npos) {
+  } else if (cmd.compare("pop") == 0) {
     return C_POP;
-  } else if (currentCommand.find("label") != string::npos) {
+  } else if (cmd.compare("label") == 0) {
     return C_LABEL;
-  } else if (currentCommand.find("if-goto") != string::npos) {
+  } else if (cmd.compare("if-goto") == 0) {
     return C_IF;
-  } else if (currentCommand.find("goto") != string::npos) {
+  } else if (cmd.compare("goto") == 0) {
     return C_GOTO;
-  } else if (currentCommand.find("function") != string::npos) {
+  } else if (cmd.compare("function") == 0) {
     return C_FUNCTION;
-  } else if (currentCommand.find("return") != string::npos) {
+  } else if (cmd.compare("return") == 0) {
     return C_RETURN;
-  } else if (currentCommand.find("call") != string::npos) {
+  } else if (cmd.compare("call") == 0) {
     return C_CALL;
   } else if (currentCommand.length() == 0) {
     return C_BLANK;

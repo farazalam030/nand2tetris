@@ -18,6 +18,10 @@ CodeWriter::CodeWriter(const string &filename)
     cout << "File " << asmfileName << " opened successfully." << endl;
   }
   putCommentVMFileName(baseFileName);
+
+#ifdef DEBUG
+  printDebugInfo();
+#endif // DEBUG
 }
 #ifdef DEBUG
 void CodeWriter::printDebugInfo() {
@@ -26,6 +30,7 @@ void CodeWriter::printDebugInfo() {
   cout << "labelCounter: " << labelCounter << endl;
   cout << "asmFile: " << asmFile.is_open() << endl;
   cout << "asmfileName: " << asmfileName << endl;
+  cout << "isMultipleVMs: " << isMultipleVMs << endl;
 }
 #endif // DEBUG
 
@@ -75,17 +80,35 @@ void CodeWriter::writePushPop(const string &command, const string &segment,
 }
 
 void CodeWriter::writeLabel(const string &label) {
-  string asmCode = labelGenerator(label);
+  string tmp = currFunc + ":" + label;
+  string asmCode = labelGenerator(tmp);
   asmFile << asmCode;
 }
 
 void CodeWriter::writeGoto(const string &label) {
-  string asmCode = gotoGenerator(label);
+  string tmp = currFunc + ":" + label;
+  string asmCode = gotoGenerator(tmp);
   asmFile << asmCode;
 }
 
 void CodeWriter::writeIf(const string &label) {
-  string asmCode = ifGenerator(label);
+  string tmp = currFunc + ":" + label;
+  string asmCode = ifGenerator(tmp);
+  asmFile << asmCode;
+}
+
+void CodeWriter::writeCall(const string &functionName, int numArgs) {
+  string asmCode = callGenerator(functionName, numArgs);
+  asmFile << asmCode;
+}
+
+void CodeWriter::writeReturn() {
+  string asmCode = returnGenerator();
+  asmFile << asmCode;
+}
+
+void CodeWriter::writeFunction(const string &functionName, int numLocals) {
+  string asmCode = functionGenerator(functionName, numLocals);
   asmFile << asmCode;
 }
 
@@ -378,5 +401,128 @@ string CodeWriter::ifGenerator(const string &label) {
   code += "D=M\n";
   code += "@" + label + "\n";
   code += "D;JNE\n";
+  return code;
+}
+
+string CodeWriter::functionGenerator(const string &functionName,
+                                     int numLocals) {
+  string code = "// ---- function" + functionName + " " + to_string(numLocals) +
+                "---  //\n";
+  currFunc = functionName;
+  code += "(" + functionName + ")\n";
+  for (int i = 0; i < numLocals; i++) {
+    code += pushGenerator("constant", 0);
+  }
+  return code;
+}
+
+string CodeWriter::callGenerator(const string &functionName, int numArgs) {
+  string code =
+      "// ---- call" + functionName + " " + to_string(numArgs) + " ---  //\n";
+  string returnAddress = functionName + "$ret." + to_string(returnLabelCounter);
+  returnLabelCounter++;
+  code += "// push return-address\n";
+  code += idx_to_ptr(SP, returnAddress);
+  code += incrementVariable(SP);
+  code += "// push LCL\n";
+  code += variable_to_pointer(SP, LCL);
+  code += incrementVariable(SP);
+  code += "// push ARG\n";
+  code += variable_to_pointer(SP, ARG);
+  code += incrementVariable(SP);
+  code += "// push THIS\n";
+  code += variable_to_pointer(SP, THIS);
+  code += incrementVariable(SP);
+  code += "// push THAT\n";
+  code += variable_to_pointer(SP, THAT);
+  code += incrementVariable(SP);
+  code += "// ARG = SP - numArgs - 5\n";
+  code += "@" + to_string(numArgs) + "\n";
+  code += "D=A\n";
+  code += "@5\n";
+  code += "D=D+A\n"; // n+5
+  code += "@" + SP + "\n";
+  code += "D=M-D\n"; // SP-n-5
+  code += "@" + ARG + "\n";
+  code += "M=D\n"; // ARG=SP-n-5
+  code += "// LCL = SP\n";
+  code += "@" + SP + "\n";
+  code += "D=M\n";
+  code += "@" + LCL + "\n";
+  code += "M=D\n";
+  code += "// goto f\n";
+  code += "@" + functionName + "\n";
+  code += "0;JMP\n";
+  code += "//(" + returnAddress + ")\n";
+  code += "(" + returnAddress + ")\n";
+  return code;
+}
+
+string CodeWriter::returnGenerator() {
+  string code = "// ---- return ---  //\n";
+  string FRAME = "R14"; //  TEMP Variable Frame
+  string RET = "R13";
+
+  code += "// Frame = LCL\n";
+  code += "@" + LCL + "\n";
+  code += "D=M\n";
+  code += "@" + FRAME + "\n";
+  code += "M=D\n";
+  code += "// retAddr = *(FRAME - 5)\n";
+  code += "@5\n";
+  code += "D=A\n";
+  code += "@" + FRAME + "\n";
+  code += "A=M-D\n";
+  code += "D=M\n";
+  code += "@" + RET + "\n";
+  code += "M=D\n";
+  code += "// *ARG = pop()\n";
+  code += "@SP\n";
+  code += "AM=M-1";
+  code += "D=M"; // D= M[SP] // pop ()
+  code += "@ARG\n";
+  code += "A=M\n";
+  code += "M=D\n"; // *ARG = pop()
+  code += "// SP = ARG + 1\n";
+  code += "@" + ARG + "\n";
+  code += "D=M+1\n";
+  code += "@" + SP + "\n";
+  code += "M=D\n";
+
+  code += "// THAT = *(FRAME - 1)\n";
+  code += "@" + FRAME + "\n";
+  code += "A=M-1\n";
+  code += "D=M\n";
+  code += "@THAT\n ";
+  code += "M=D\n";
+  code += "// THIS = *(endFrame - 2)\n";
+  code += "@2\n";
+  code += "D=A\n"; // D= 2
+  code += "@" + FRAME + "\n";
+  code += "A=M-D\n"; // A = M[FRAME] - 2
+  code += "D=M\n";   // D = * (M[FRAME] - 2)
+  code += "@THIS\n";
+  code += "M=D\n"; // THIS = * (M[FRAME] - 2)
+  code += "// ARG = *(FRAME - 3)\n";
+  code += "@3\n";
+  code += "D=A\n"; // D = 3
+  code += "@" + FRAME + "\n";
+  code += "A=M-D\n"; // A = M[FRAME] - 3
+  code += "D=M\n";   // D = * (M[FRAME] - 3)
+  code += "@ARG\n";
+  code += "M=D\n"; // THIS = * (M[FRAME] - 2)
+
+  code += "// LCL = *(FRAME - 4)\n";
+  code += "@4\n";
+  code += "D=A\n"; // D = 4
+  code += "@" + FRAME + "\n";
+  code += "A=M-D\n"; // A = M[FRAME] - 4
+  code += "D=M\n";   // D = * (M[FRAME] - 4)
+  code += "@LCL\n";
+  code += "M=D\n"; // THIS = * (M[FRAME] - 4)
+
+  code += "//goto RET\n";
+  code += "@" + RET + "\n";
+  code += "A=M\n";
   return code;
 }

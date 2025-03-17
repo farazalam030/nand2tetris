@@ -36,9 +36,7 @@ public:
   string getCmd();
   string getArg1();
   int getArg2();
-  /*TODO HELPER Functions*/
-  //   string &getCurrLine();
-  //   void close();
+
   void removeWhitespace(string &line);
   ~Parser();
 };
