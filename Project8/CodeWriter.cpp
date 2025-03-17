@@ -30,8 +30,7 @@ CodeWriter::CodeWriter(const string &filename, const bool &isMultiVM = false,
         currentVmFile.substr(currentVmFile.find_last_of('/') + 1, string::npos);
     // baseFileName = baseFileName.substr(0, baseFileName.find_last_of('.') -
     // 0);
-    asmfileName =
-        currentVmFile.substr(0, currentVmFile.find_last_of('.')) + ".asm";
+    asmfileName = currentVmFile + "/" + baseFileName + ".asm";
 #ifdef DEBUG
     cout << "In " << __FILE__ << " " << __LINE__ << endl;
     cout << " currentVMFile: " << currentVmFile << endl;
@@ -62,8 +61,9 @@ CodeWriter::CodeWriter(const string &filename, const bool &isMultiVM = false,
 #endif // DEBUG
 }
 #ifdef DEBUG
-void CodeWriter::printDebugInfo()
-{
+void CodeWriter::printDebugInfo() {
+  cout << __FILE__ << " : " << __LINE__ << endl;
+  cout << "PRINT DEBUG INFO\n";
   cout << "currentVmFile: " << currentVmFile << endl;
   cout << "baseFileName: " << baseFileName << endl;
   cout << "labelCounter: " << labelCounter << endl;
