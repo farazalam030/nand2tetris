@@ -53,8 +53,8 @@ CodeWriter::CodeWriter(const string &filename, const bool &isMultiVM = false,
     string init = generateSysInit();
     asmFile << init;
   }
-
-  putCommentVMFileName(currentVmFile);
+  if (!isMultipleVMs)
+    putCommentVMFileName(currentVmFile);
 
 #ifdef DEBUG
   printDebugInfo();
@@ -319,21 +319,14 @@ string CodeWriter::arithmeticLogicalGenerator(const string &command)
   asmCode += "D = M\n";             // D=*A
   asmCode += decrementVariable(SP); // SP--
   asmCode += "A = M\n";             // A=*SP
-  if (command == "add")
-  {
+  if (command.compare("add") == 0) {
     asmCode += "D = D + M\n"; // D = D+*A
-  }
-  else if (command == "sub")
-  {
+  } else if (command.compare("sub") == 0) {
     asmCode += "D = D-M\n"; // D=*A-D
     asmCode += "D = -D\n";  // D = -D
-  }
-  else if (command == "and")
-  {
+  } else if (command.compare("and") == 0) {
     asmCode += "D = D&M\n"; // D = D&M
-  }
-  else if (command == "or")
-  {
+  } else if (command.compare("or") == 0) {
     asmCode += "D = D|M\n"; // D = D|M
   }
 
@@ -490,20 +483,20 @@ CodeWriter::~CodeWriter()
 
 string CodeWriter::labelGenerator(const string &label)
 {
-  string code = "// ---- label" + label + " ---  //\n";
+  string code = "// ---- label " + label + " ---  //\n";
   code += "(" + label + ")\n";
   return code;
 }
 string CodeWriter::gotoGenerator(const string &label)
 {
-  string code = "// ---- goto" + label + " ---  //\n";
+  string code = "// ---- goto " + label + " ---  //\n";
   code += "@" + label + "\n";
   code += "0;JMP\n";
   return code;
 }
 string CodeWriter::ifGenerator(const string &label)
 {
-  string code = "// ---- if-goto" + label + " ---  //\n";
+  string code = "// ---- if-goto " + label + " ---  //\n";
   code += decrementVariable(SP);
   code += "A = M\n";
   code += "D = M\n";
@@ -516,7 +509,7 @@ string CodeWriter::functionGenerator(const string &functionName,
                                      int numLocals)
 {
   string code = "// ---- function " + functionName + " " +
-                to_string(numLocals) + "---  //\n";
+                to_string(numLocals) + " ---  //\n";
   currFunc = functionName;
   code += "(" + functionName + ")\n";
   for (int i = 0; i < numLocals; i++)
@@ -596,8 +589,8 @@ string CodeWriter::returnGenerator()
   code += "M = D\n";
   code += "// *ARG = pop()\n";
   code += "@SP\n";
-  code += "AM = M - 1";
-  code += "D = M"; // D= M[SP] // pop ()
+  code += "AM = M - 1\n";
+  code += "D = M\n"; // D= M[SP] // pop ()
   code += "@ARG\n";
   code += "A = M\n";
   code += "M = D\n"; // *ARG = pop()
@@ -642,6 +635,7 @@ string CodeWriter::returnGenerator()
   code += "//goto RET\n";
   code += "@" + RET + "\n";
   code += "A = M\n";
+  code += "0 ; JMP\n";
   return code;
 }
 
@@ -651,73 +645,79 @@ string CodeWriter::generateSysInit()
   code += "@256\n";
   code += "D = A\n";
   code += "@SP\n";
-  code += "M = D\n"; // SP = 256
+  code += "// SP = 256\n";
+  code += "M = D\n";
 
-  // code += "@1\n";
-  // code += "D = A\n";
-  // code += "@LCL\n";
-  // code += "M = D\n"; // SP = 256
+  code += "// LCL = 1\n";
+  code += "@1\n";
+  code += "D = A\n";
+  code += "@LCL\n";
+  code += "M = D\n";
 
-  // code += "@2\n";
-  // code += "D = A\n";
+  code += "// ARG = 2\n";
+  code += "@2\n";
+  code += "D = A\n";
   code += "@ARG\n";
-  code += "M = D\n"; // SP = 256
+  code += "M = D\n";
 
-  // code += "@3\n";
-  // code += "D = A\n";
-  // code += "@THIS\n";
-  // code += "M = D\n"; // SP = 256
+  code += "// THIS = 3\n";
+  code += "@3\n";
+  code += "D = A\n";
+  code += "@THIS\n";
+  code += "M = D\n";
 
-  // code += "@4\n";
-  // code += "D = A\n";
-  // code += "@THAT\n";
-  // code += "M = D\n"; // SP = 256
+  code += "// THAT = 4\n";
+  code += "@4\n";
+  code += "D = A\n";
+  code += "@THAT\n";
+  code += "M = D\n";
 
-  // code += "@bootstrap\n";
-  // code += "D = A\n";
-  // code += "@SP\n";
-  // code += "A = M\n";
-  // code += "M = D\n";
-  // code += "@SP\n";
-  // code += "M = M + 1\n";
+  code += "// @bootstrap\n";
+  code += "@bootstrap\n";
+  code += "D = A\n";
+  code += "@SP\n";
+  code += "A = M\n";
+  code += "M = D\n";
+  code += "@SP\n";
+  code += "M = M + 1\n";
 
-  // code += "@LCL\n";
-  // code += "D = M\n";
-  // code += "@SP\n";
-  // code += "A = M\n";
-  // code += "M = D\n";
-  // code += "@SP\n";
-  // code += "M = M + 1\n";
+  code += "@LCL\n";
+  code += "D = M\n";
+  code += "@SP\n";
+  code += "A = M\n";
+  code += "M = D\n";
+  code += "@SP\n";
+  code += "M = M + 1\n";
 
-  // code += "@ARG\n";
-  // code += "D = M\n";
-  // code += "@SP\n";
-  // code += "A = M\n";
-  // code += "M = D\n";
-  // code += "@SP\n";
-  // code += "M = M + 1\n";
+  code += "@ARG\n";
+  code += "D = M\n";
+  code += "@SP\n";
+  code += "A = M\n";
+  code += "M = D\n";
+  code += "@SP\n";
+  code += "M = M + 1\n";
 
-  // code += "@THIS\n";
-  // code += "D = M\n";
-  // code += "@SP\n";
-  // code += "A = M\n";
-  // code += "M = D\n";
-  // code += "@SP\n";
-  // code += "M = M + 1\n";
+  code += "@THIS\n";
+  code += "D = M\n";
+  code += "@SP\n";
+  code += "A = M\n";
+  code += "M = D\n";
+  code += "@SP\n";
+  code += "M = M + 1\n";
 
-  // code += "@THAT\n";
-  // code += "D = M\n";
-  // code += "@SP\n";
-  // code += "A = M\n";
-  // code += "M = D\n";
-  // code += "@SP\n";
-  // code += "M = M + 1\n";
+  code += "@THAT\n";
+  code += "D = M\n";
+  code += "@SP\n";
+  code += "A = M\n";
+  code += "M = D\n";
+  code += "@SP\n";
+  code += "M = M + 1\n";
 
-  // code += "@5\nD = A\n@SP\nD = M - D\n@ARG\nM = D\n"; // n=0 and ARG = SP
-  // -n-5;
+  code += "@5\nD = A\n@SP\nD = M - D\n@ARG\nM = D\n"; // n=0 and ARG = SP
+  // -n - 5;
 
-  // code += "@SP\nD = M\n@LCL\nM = D\n"; //  LCL = SP
-  // code += "@Sys.init\n0;JMP\n(bootstrap)\n";
+  code += "@SP\nD = M\n@LCL\nM = D\n"; //  LCL = SP
+  code += "@Sys.init\n0;JMP\n(bootstrap)\n";
   code += callGenerator("Sys.init", 0);
 
   return code;

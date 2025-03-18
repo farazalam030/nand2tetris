@@ -26,7 +26,13 @@ public:
   bool sysInitNeeded;
   void setcurrentVmFile(const string &currentVMFile) {
     currentVmFile = currentVMFile;
+
+    baseFileName = currentVmFile.substr(currentVmFile.find_last_of('/') + 1);
+    baseFileName = baseFileName.substr(0, baseFileName.find_last_of('.') - 0);
+    if (isMultipleVMs)
+      putCommentVMFileName(baseFileName);
   }
+
   string getcurrentVmFile() { return currentVmFile; }
   void setBaseFileName(const string &baseFile) { baseFileName = baseFile; }
   string getBaseFileName() { return baseFileName; }

@@ -74,14 +74,16 @@ int main(int argc, char const *argv[]) {
     vmTranslator(parser, codeWriter, inputVMFilePath, false, false);
   }
 
+  codeWriter.close();
+
   return 0;
 }
 
 void vmTranslator(Parser &parser, CodeWriter &codeWriter, string &filePath,
                   bool isMultiVM, bool sysInitNeeded) {
-  codeWriter.setcurrentVmFile(filePath);
   codeWriter.setisMultipleVMs(isMultiVM);
   codeWriter.setsysInitNeeded(sysInitNeeded);
+  codeWriter.setcurrentVmFile(filePath);
 
   parser.setVmFile(filePath);
 
@@ -110,6 +112,4 @@ void vmTranslator(Parser &parser, CodeWriter &codeWriter, string &filePath,
 
     lineNumber++;
   }
-
-  codeWriter.close();
 }
