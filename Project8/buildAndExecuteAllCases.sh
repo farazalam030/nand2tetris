@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git clean -fdx
+# git clean -fdx
 ./build.sh FunctionCalls/FibonacciElement 1 &> FibonacciElement.log
 ./build.sh FunctionCalls/StaticsTest 1 &> StaticsTest.log
 ./build.sh FunctionCalls/SimpleFunction/SimpleFunction.vm 1 &> SimpleFunction.vm.log
