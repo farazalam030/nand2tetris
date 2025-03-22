@@ -1,0 +1,43 @@
+class Main {
+    static Quiz quiz;
+
+    function void main() {
+        var Array questions;
+        var Array answers;
+        var int score;
+        var int i;
+
+        // Initialize questions and answers
+        let questions = Array.new(3);
+        let answers = Array.new(3);
+
+        let questions[0] = "What is the capital of France?";
+        let answers[0] = "Paris";
+
+        let questions[1] = "What is 2 + 2?";
+        let answers[1] = "4";
+
+        let questions[2] = "What is the color of the sky?";
+        let answers[2] = "Blue";
+
+        // Initialize quiz
+        let quiz = Quiz.new(questions, answers);
+
+        // Run quiz
+        let score = 0;
+        let i = 0;
+        while (i < 3) {
+            if (quiz.askQuestion(i)) {
+                let score = score + 1;
+            }
+            let i = i + 1;
+        }
+
+        // Display final score
+        do Output.printString("Your final score is: ");
+        do Output.printInt(score);
+        do Output.println();
+
+        return;
+    }
+}

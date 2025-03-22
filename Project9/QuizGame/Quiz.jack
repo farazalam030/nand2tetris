@@ -1,0 +1,35 @@
+class Quiz {
+    field Array questions;
+    field Array answers;
+
+    constructor Quiz new(Array q, Array a) {
+        let questions = q;
+        let answers = a;
+        return this;
+    }
+
+    method boolean askQuestion(int index) {
+        var String userAnswer;
+        var boolean isCorrect;
+
+        // Display question
+        do Output.printString(questions[index]);
+        do Output.println();
+
+        // Get user answer
+        let userAnswer = Keyboard.readString("Your answer: ");
+
+        // Check if answer is correct
+        if (userAnswer = answers[index]) {
+            do Output.printString("Correct!");
+            let isCorrect = true;
+        } else {
+            do Output.printString("Incorrect. The correct answer is: ");
+            do Output.printString(answers[index]);
+            let isCorrect = false;
+        }
+        do Output.println();
+
+        return isCorrect;
+    }
+}
