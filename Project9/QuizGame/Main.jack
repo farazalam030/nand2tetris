@@ -4,24 +4,29 @@ class Main {
     function void main() {
         var Array questions;
         var Array answers;
+        var Array options;
         var int score;
         var int i;
 
         // Initialize questions and answers
         let questions = Array.new(3);
         let answers = Array.new(3);
+        let options = Array.new(3);
 
         let questions[0] = "What is the capital of France?";
-        let answers[0] = "Paris";
+        let options[0] ="A. PARIS  B. TOKYO  C. MUMBAI  D. LONDON";
+        let answers[0] = "A";
 
         let questions[1] = "What is 2 + 2?";
-        let answers[1] = "4";
+        let options[1] = "A. 6    B. 4    C. 8    D. 10";
+        let answers[1] = "B";
 
         let questions[2] = "What is the color of the sky?";
-        let answers[2] = "Blue";
+        let options[2] = "A. RED    B. GREEN    C. BLUE    D. WHITE";
+        let answers[2] = "C";
 
         // Initialize quiz
-        let quiz = Quiz.new(questions, answers);
+        let quiz = Quiz.new(questions, answers,options);
 
         // Run quiz
         let score = 0;

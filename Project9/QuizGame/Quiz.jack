@@ -1,10 +1,12 @@
 class Quiz {
     field Array questions;
     field Array answers;
+    field Array options;
 
-    constructor Quiz new(Array q, Array a) {
+    constructor Quiz new(Array q, Array a, Array o) {
         let questions = q;
         let answers = a;
+        let options=o;
         return this;
     }
 
@@ -15,9 +17,11 @@ class Quiz {
         // Display question
         do Output.printString(questions[index]);
         do Output.println();
+        do Output.printString(options[index]);
+        do Output.println();
 
         // Get user answer
-        let userAnswer = Keyboard.readString("Your answer: ");
+        let userAnswer = Keyboard.readLine("Your answer: ");
 
         // Check if answer is correct
         if (userAnswer = answers[index]) {
