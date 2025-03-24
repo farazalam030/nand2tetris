@@ -58,10 +58,12 @@ class Main {
         let i = 0;
         let k = 0;
         while (i < 10) {
+
             if (quiz.askQuestion(i)) {
                 let score = score + 1;
             }
             let i = i + 1;
+
         }
         // Display final score
         do Output.printString("Your final score is: ");
