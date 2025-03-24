@@ -7,23 +7,29 @@ class Main {
         var Array options;
         var int score;
         var int i;
+        var int k;
 
         // Initialize questions and answers
         let questions = Array.new(3);
         let answers = Array.new(3);
         let options = Array.new(3);
 
-        let questions[0] = "What is the capital of France?";
-        let options[0] ="A. PARIS  B. TOKYO  C. MUMBAI  D. LONDON";
-        let answers[0] = "A";
 
-        let questions[1] = "What is 2 + 2?";
-        let options[1] = "A. 6    B. 4    C. 8    D. 10";
-        let answers[1] = "B";
 
-        let questions[2] = "What is the color of the sky?";
-        let options[2] = "A. RED    B. GREEN    C. BLUE    D. WHITE";
-        let answers[2] = "C";
+
+
+        let questions[0] = "I) What is the primary purpose of Project 9 in the Nand to Tetris course?";
+
+        let options[0] ="1.  Develop an operating system  2.  Build a Jack compiler  3.  Create a Jack application  4.  Construct a VM translator";
+        let answers[0] = 3;
+
+        let questions[1] = "II) Which type of programming does the Jack language support?";
+        let options[1] ="1.  Object-based programming 2.  Functional programming  3.  Procedural programming  4.  Logic programming";
+        let answers[1] = 2;
+
+        let questions[2] = "III) What is the name of the mandatory entry point in a Jack program?";
+        let options[2] = "1.  Main.entry    2.  main() function of the Main class    3.   program.start()    4.  application.init()";
+        let answers[2] = 2;
 
         // Initialize quiz
         let quiz = Quiz.new(questions, answers,options);
@@ -31,11 +37,13 @@ class Main {
         // Run quiz
         let score = 0;
         let i = 0;
+        let k = 0;
         while (i < 3) {
             if (quiz.askQuestion(i)) {
                 let score = score + 1;
             }
             let i = i + 1;
+
         }
 
         // Display final score
