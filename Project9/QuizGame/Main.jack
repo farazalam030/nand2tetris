@@ -1,6 +1,5 @@
 class Main {
     static Quiz quiz;
-
     function void main() {
         var Array questions;
         var Array answers;
@@ -8,87 +7,66 @@ class Main {
         var int score;
         var int i;
         var int k;
-
         // Initialize questions and answers
-        let questions = Array.new(3);
-        let answers = Array.new(3);
-        let options = Array.new(6);
-
-/**
-
-
-  IV What are the two main categories of data types in the Jack language?
-1) Static and Dynamic types   2) Primitive and Class types  3) Integer and String types 4) Abstract and Concrete types
-  Answer:  2
-
-  V. In Jack, which of these is a primitive data type?
-1) char  2) String  3) List 4) Array
-  Answer:   1
-
-  VI. What is the purpose of the Keyboard OS class in Jack?
-1) Reading input from the user 2) Generates random numbers 3) Displays to the screen 4) Managing system files
-  Answer:   1
-
-  VII. What does the Output OS class in Jack handle?
-1) Reading keyboard inputs 2) Manipulating strings 3) Printing text to the screen 4) Managing memory allocation
-  Answer:   3
-
-  VIII. In Jack syntax, which keyword initiates a conditional statement?
-1) do  2) while  3) if  4) let
-  Answer:   3
-
-  IX. What is a key feature of Jack's control flow?
-1) It supports recursion  2) It uses predefined methods only 3) It relies on high-level method calls 4) It includes constructs like `if` and `while`
-  Answer:   d
-
-  X. What does the `do` statement in Jack signify?
-1) Declaring a variable  2) Defining a class  3) Calling a method outside an expression  4) Initializing an array
-  Answer:   c
-
-
-
-*/
-
-
-
+        let questions = Array.new(10);
+        let answers = Array.new(10);
+        let options = Array.new(20);
         let questions[0] = "I) What is the primary purpose of Project 9 in the Nand to Tetris course?";
-
         let options[0] ="1.  Develop an operating system  2.  Build a Jack compiler";
         let options[1] ="3.  Create a Jack application    4.  Construct a VM translator";
         let answers[0] = 3;
-
         let questions[1] = "II) Which type of programming does the Jack language support?";
         let options[2] ="1.  Object-based programming 2.  Functional programming";
         let options[3] ="3.  Procedural programming   4.  Logic programming";
         let answers[1] = 1;
-
         let questions[2] = "III) What is the name of the mandatory entry point in a Jack program?";
-        let options[4] = "1.  Main.entry          2.  main() function of the Main class";
-        let options[5] = "3.   program.start()    4.  application.init()";
+        let options[4] = "1.  Main.entry        2.  main() function of the Main class";
+        let options[5] = "3.  program.start()   4.  application.init()";
         let answers[2] = 2;
-
+        let questions[3] = "IV What are the two main categories of data types in the Jack language?";
+        let options[6]   = "1) Static and Dynamic types 2) Primitive and Class types";
+        let options[7]   = "3) Integer and String types 4) Abstract and Concrete types";
+        let answers[3] = 2;
+        let questions[4] = "V. In Jack, which of these is a primitive data type?";
+        let options[8] ="1) char  2) String";
+        let options[9] ="3) List  4) Array";
+        let answers[4] = 1;
+        let questions[5] = "VI. What is the purpose of the Keyboard OS class in Jack?";
+        let options[10] = "1) Reading input from the user 2) Generates random numbers";
+        let options[11] = "3) Displays to the screen      4) Managing system files";
+        let answers[5] = 1;
+        let questions[6] = "VII. What does the Output OS class in Jack handle?";
+        let options[12]   = "1) Reading keyboard inputs     2) Manipulating strings";
+        let options[13]   = "3) Printing text to the screen 4) Managing memory allocation";
+        let answers[6] = 3;
+        let questions[7] = "VIII. In Jack syntax, which keyword initiates a conditional statement?";
+        let options[14] ="1) do  2) while";
+        let options[15] ="3) if  4) let";
+        let answers[7] = 3;
+        let questions[8] = "IX. What is a key feature of Jack's control flow?";
+        let options[16] = "1) Recursion               2) Predefined methods only";
+        let options[17] = "3) High-level method calls 4) constructs like if and while";
+        let answers[8] = 4;
+        let questions[9] = "IX. What is a key feature of Jack's control flow?";
+        let options[18] = "1) Recursion               2) Predefined methods only";
+        let options[19] = "3) High-level method calls 4) constructs like if and while";
+        let answers[9] = 4;
         // Initialize quiz
         let quiz = Quiz.new(questions, answers,options);
-
         // Run quiz
         let score = 0;
         let i = 0;
         let k = 0;
-        while (i < 3) {
+        while (i < 10) {
             if (quiz.askQuestion(i)) {
                 let score = score + 1;
             }
             let i = i + 1;
-
-            // do Screen.clearScreen();
-
         }
-
         // Display final score
         do Output.printString("Your final score is: ");
         do Output.printInt(score);
         do Output.println();
-
         return;
     }
 }

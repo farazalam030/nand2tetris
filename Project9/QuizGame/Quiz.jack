@@ -2,7 +2,6 @@ class Quiz {
     field Array questions;
     field Array answers;
     field Array options;
-
     constructor Quiz new(Array q, Array a, Array o) {
         let questions = q;
         let answers = a;
@@ -10,28 +9,11 @@ class Quiz {
         return this;
     }
 
-
-
-//     method boolean isCorrectAnswer(string correctAns,string userAns)
-//    {
-//       var int i;
-//       let i =0;
-//       while(i < userAns.length())
-//       {
-//          if(~ (userAns.charAt(i) = correctAns.charAt(i)))
-//          {
-//            return 0;
-//          }
-//          let i=i+1;
-//       }
-//       return -1;
-//    }
-
     method boolean askQuestion(int index) {
         var String userAnswer;
         var boolean isCorrect;
         var int optIndex;
-
+        var int correctAnswer;
         // Display question
         let optIndex=index*2;
         do Output.printString(questions[index]);
@@ -40,24 +22,19 @@ class Quiz {
         do Output.println();
         do Output.printString(options[optIndex+1]);
         do Output.println();
-
         // Get user answer
         let userAnswer = Keyboard.readInt("Your Answer: " );
-
         do Output.println();
-
-         if (userAnswer = answers[index]) {
+        let correctAnswer=answers[index];
+         if (userAnswer = correctAnswer) {
             do Output.printString("Correct!");
             let isCorrect = true;
         } else {
-            // do Screen.clearScreen();
             do Output.printString("Incorrect. The correct answer is: ");
-            do Output.printString(answers[index]);
+            do Output.printInt(correctAnswer);
             let isCorrect = false;
         }
         do Output.println();
-
         return isCorrect;
     }
-
 }
