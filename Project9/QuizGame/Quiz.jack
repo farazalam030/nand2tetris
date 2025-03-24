@@ -7,7 +7,17 @@ class Quiz {
         let answers = a;
         let options=o;
         return this;
+
+
     }
+
+   method void drawRect (int x, int y, boolean color, int size )
+   {
+
+    do Screen.setColor(color);
+    do Screen.drawRectangle(x,y,x+size,y+size);
+    return;
+   }
 
     method boolean askQuestion(int index) {
         var String userAnswer;
