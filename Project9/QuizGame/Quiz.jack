@@ -30,11 +30,15 @@ class Quiz {
     method boolean askQuestion(int index) {
         var String userAnswer;
         var boolean isCorrect;
+        var int optIndex;
 
         // Display question
+        let optIndex=index*2;
         do Output.printString(questions[index]);
         do Output.println();
-        do Output.printString(options[index]);
+        do Output.printString(options[optIndex]);
+        do Output.println();
+        do Output.printString(options[optIndex+1]);
         do Output.println();
 
         // Get user answer
@@ -46,6 +50,7 @@ class Quiz {
             do Output.printString("Correct!");
             let isCorrect = true;
         } else {
+            // do Screen.clearScreen();
             do Output.printString("Incorrect. The correct answer is: ");
             do Output.printString(answers[index]);
             let isCorrect = false;

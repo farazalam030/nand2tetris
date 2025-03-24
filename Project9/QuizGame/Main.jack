@@ -12,7 +12,7 @@ class Main {
         // Initialize questions and answers
         let questions = Array.new(3);
         let answers = Array.new(3);
-        let options = Array.new(3);
+        let options = Array.new(6);
 
 /**
 
@@ -53,15 +53,18 @@ class Main {
 
         let questions[0] = "I) What is the primary purpose of Project 9 in the Nand to Tetris course?";
 
-        let options[0] ="1.  Develop an operating system  2.  Build a Jack compiler  3.  Create a Jack application  4.  Construct a VM translator";
+        let options[0] ="1.  Develop an operating system  2.  Build a Jack compiler";
+        let options[1] ="3.  Create a Jack application    4.  Construct a VM translator";
         let answers[0] = 3;
 
         let questions[1] = "II) Which type of programming does the Jack language support?";
-        let options[1] ="1.  Object-based programming 2.  Functional programming  3.  Procedural programming  4.  Logic programming";
-        let answers[1] = 2;
+        let options[2] ="1.  Object-based programming 2.  Functional programming";
+        let options[3] ="3.  Procedural programming   4.  Logic programming";
+        let answers[1] = 1;
 
         let questions[2] = "III) What is the name of the mandatory entry point in a Jack program?";
-        let options[2] = "1.  Main.entry    2.  main() function of the Main class    3.   program.start()    4.  application.init()";
+        let options[4] = "1.  Main.entry          2.  main() function of the Main class";
+        let options[5] = "3.   program.start()    4.  application.init()";
         let answers[2] = 2;
 
         // Initialize quiz
@@ -76,6 +79,8 @@ class Main {
                 let score = score + 1;
             }
             let i = i + 1;
+
+            // do Screen.clearScreen();
 
         }
 
