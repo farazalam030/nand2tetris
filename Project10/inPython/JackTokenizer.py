@@ -47,7 +47,6 @@ class JackTokenizer:
         self.symbols_dict = {'{': 'symbol', '}': 'symbol', '(': 'symbol', ')': 'symbol', '[': 'symbol', ']': 'symbol', '.': 'symbol', ';': 'symbol', '+': 'symbol',
                              '-': 'symbol', '*': 'symbol', '/': 'symbol', '&': 'symbol', '|': 'symbol', '<': 'symbol', '>': 'symbol', '=': 'symbol', '~': 'symbol', ',': 'symbol'}
 
-
         if file_name[-5:] == ".jack":
             self.file_name = file_name[:-5]
         else:
@@ -75,7 +74,8 @@ class JackTokenizer:
                         multi_comments = True
                         current_line = current_line[:startMultiComment]
                     else:
-                        current_line = current_line[:startMultiComment] + current_line[endMultiComment+2:]
+                        current_line = current_line[:startMultiComment] + \
+                            current_line[endMultiComment+2:]
                 self.codes.append((current_line.strip()))
 
     def tokenize(self):
