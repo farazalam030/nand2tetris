@@ -49,7 +49,7 @@ class JackTokenizer:
 
 
         if file_name[-5:] == ".jack":
-            self.file_name = file_name[:-4]
+            self.file_name = file_name[:-5]
         else:
             print("the input file must be Xxx.jack")
             exit(-1)
@@ -85,7 +85,7 @@ class JackTokenizer:
         for code in self.codes:
             if code.find('\"') != -1:
                 s = code.find('\"')
-                e = s + 1 + code[s + 1:].find('\"')
+                e = code.rfind('\"')
                 self.strings.append(code[s + 1:e])
                 code = code[:s] + code[e:]
             tmp = code.split()
@@ -107,10 +107,14 @@ class JackTokenizer:
             self.handle_code(code[1:])
         elif code[0].isdecimal():
             integer = code
-            for i, s in enumerate(code[1:], 1):
-                if s.isdecimal() == False:
-                    integer = code[:i]
+            for index, chars in enumerate(code[1:], 1):
+                if chars.isdecimal() == False:
+                    integer = code[:index]
                     break
+            intIntger = int(integer)
+            if intIntger > 32767 or intIntger < 0:
+                print("the integer constant is out of range")
+                exit(-1)
             self.tokens.append(Token("integerConstant", integer))
             if len(integer) == len(code):
                 return

@@ -1,16 +1,15 @@
 import JackTokenizer as JT
 
 class JackCompilationEngine:
-	"""
-	"""
+
 	def __init__(self, tokens, output_file):
 		self.tokens = tokens
 		self.output_file = output_file
-		self.tot = len(self.tokens)
+		self.tokenLength = len(self.tokens)
 		self.completeTokens = []
 		self.cur_loc = 0
-		self.classDec = ['static', 'field']
-		self.funcDec = ['constructor', 'function', 'method']
+		self.classVarDec = ['static', 'field']
+		self.subroutineDec = ['constructor', 'function', 'method']
 		self.statements = ['let', 'if', 'while', 'do', 'return']
 		self.op = ['+', '-', '*', '/', '&', '|', '<', '>', '=']
 		self.unary_op =['-', '~']
@@ -21,17 +20,17 @@ class JackCompilationEngine:
 		self.CompileClass()
 
 	def next(self):
-		if self.cur_loc >= self.tot:
+		if self.cur_loc >= self.tokenLength:
 			return None
-		nex = self.tokens[self.cur_loc]
+		nextt = self.tokens[self.cur_loc]
 		self.cur_loc += 1
-		return nex
+		return nextt
 
 	def peek(self):
-		if self.cur_loc >= self.tot:
+		if self.cur_loc >= self.tokenLength:
 			return None
-		nex = self.tokens[self.cur_loc]
-		return nex
+		nextt = self.tokens[self.cur_loc]
+		return nextt
 
 	def add(self, token):
 		self.completeTokens.append(token)
@@ -41,9 +40,9 @@ class JackCompilationEngine:
 		self.add(self.next()) # class
 		self.add(self.next()) # className
 		self.add(self.next()) # {
-		while self.peek().value in self.classDec:
+		while self.peek().value in self.classVarDec:
 			self.CompileClassVarDec()
-		while self.peek().value in self.funcDec:
+		while self.peek().value in self.subroutineDec:
 			self.CompileSubroutine()
 		self.add(self.next()) # }
 		self.add(JT.NonTerminalToken('class', False)) # </class>
