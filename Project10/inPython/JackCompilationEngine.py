@@ -12,7 +12,7 @@ class JackCompilationEngine:
         self.classVarDec = ['static', 'field']
         self.subroutineDec = ['constructor', 'function', 'method']
         self.statements = ['let', 'if', 'while', 'do', 'return']
-        self.op = ['+', '-', '*', '/', '&', '|', '<', '>', '=']
+        self.binary_operands = ['+', '-', '*', '/', '&', '|', '<', '>', '=']
         self.unary_op = ['-', '~']
 
     def run(self):
@@ -182,7 +182,7 @@ class JackCompilationEngine:
     def CompileExpression(self):
         self.add(JT.NonTerminalToken('expression', True))
         self.CompileTerm()
-        while self.peek().value in self.op:
+        while self.peek().value in self.binary_operands:
             self.add(self.next())  # op
             self.CompileTerm()
         self.add(JT.NonTerminalToken('expression', False))
