@@ -26,9 +26,7 @@ class NonTerminalToken:
 
 
 class JackTokenizer:
-    """
-    filter the input Xxx.jack file into tokens
-    """
+
 
     def __init__(self, file_name):
 
@@ -111,9 +109,9 @@ class JackTokenizer:
                 if chars.isdecimal() == False:
                     integer = code[:index]
                     break
-            intIntger = int(integer)
-            if intIntger > 32767 or intIntger < 0:
-                print("the integer constant is out of range")
+            intInteger = int(integer)
+            if intInteger > 32767 or intInteger < 0:
+                print("the integer constant is out of range [0, 32767]")
                 exit(-1)
             self.tokens.append(Token("integerConstant", integer))
             if len(integer) == len(code):
