@@ -1,149 +1,142 @@
-import os
-multiComment=False
-lineList=[]
+class Token:
 
-tokenClassDict = {
-    'class':'keyword',
-    'constructor' : 'keyword',
-    'function':'keyword',
-    'method': 'keyword',
-    'field' : 'keyword',
-    'static': 'keyword',
-    'var': 'keyword',
-    'int': 'keyword',
-    'char': 'keyword',
-    'boolean': 'keyword',
-    'void': 'keyword',
-    'true': 'keyword',
-    'false': 'keyword',
-    'null': 'keyword',
-    'this': 'keyword',
-    'let': 'keyword',
-    'do': 'keyword',
-    'if': 'keyword',
-    'else': 'keyword',
-    'while': 'keyword',
-    'return': 'keyword',
-    '{':'symbol',
-    '}':'symbol',
-    '(':'symbol',
-    ')':'symbol',
-    '[':'symbol',
-    ']':'symbol',
-    '.':'symbol',
-    ',':'symbol',
-    ';':'symbol',
-    '+':'symbol',
-    '-':'symbol',
-    '/':'symbol',
-    '*':'symbol',
-    '&':'symbol',
-    '|':'symbol',
-    '<':'symbol',
-    '>':'symbol',
-    '=':'symbol',
-    '~':'symbol',
-}
-
-jackProgram="/mnt/c/Users/Faraz/nand2tetris/Project10/ExpressionLessSquare/Main.jack"
-tokenizedOutxml= os.path.dirname(jackProgram) + '/'+ os.path.basename(jackProgram).split('.')[0]+'TT.xml'
-print (tokenizedOutxml)
-
-with open(jackProgram,"r+") as f:
-    for line in f:
-        x=line.split('//')
-        x=x[0].split('/*')
-        codeLine=x[0].strip()
-        if len(codeLine) != 0:
-            if (codeLine.startswith('/**')):
-                multiComment=True
-                if multiComment and codeLine.endswith("*/"):
-                    multiComment=False
-                    continue;
-            if codeLine.endswith('*/'):
-                multiComment=False
-                continue
-            lineList.append(codeLine)
-
-with open (tokenizedOutxml,'w') as f :
-    f.write("<tokens>\n")
-    for line in lineList:
-        localTknlist=line.split(' ')
-        lenthLocalTknList=len(localTknlist)
-        for token in localTknlist:
-            print(token)
-
-            if token in tokenClassDict:
-                f.write('<' + tokenClassDict[token] + "> " + token + " </" + tokenClassDict[token]+'>\n')
-            elif token.isnumeric():
-                number=int(token)
-                if number >= 0 and number <= 32767:
-                    f.write('<' + 'integerConstant' + "> " + token + " </" +'integerConstant'  +'>\n')
-                else:
-                    print ("Out of bound number used")
-                    exit(-1)
-            elif '"' in token:
-                firstDoubleQuotePosition = token.find('"')
-                secondDoubleQuotePosition = token.rfind('"')
-                stringConstant = token[firstDoubleQuotePosition +
-                                       1: secondDoubleQuotePosition]
-                f.write('<' + 'stringConstant' + "> " +
-                        stringConstant + " </" + 'stringConstant' + '>\n')
-            elif '=' in token:
-                equalPosition = token.find('=')
-                idVar = token[:equalPosition]
-                f.write('<' + 'identifier' + "> " +
-                        idVar + " </" + 'identifier' + '>\n')
-                f.write('<' + tokenClassDict[token[equalPosition]] + "> " +
-                        token[equalPosition] + " </" + tokenClassDict[token[equalPosition]] + '>\n')
-                if token[equalPosition+1] == ' ':
-                    equalPosition += 1
-            elif (token.find('.') != -1):
-                print(token)
-                dotPosition = token.find('.')
-                semiColonPosition = token.find(';')
-                openBraceketPosition = token.find('(')
-                closeBraceketPosition = token.find(')')
-                identifier1 = token[:dotPosition]
-                identifier2=""
-                if (openBraceketPosition != -1):
-                    identifier2 = token[dotPosition+1:openBraceketPosition].strip()
+    def __init__(self, category, value):
+        self.value = value
+        self.t = category
+        self.is_terminal = True
+        self.value_map = {'<': '&lt;', '>': '&gt;', '&': '&amp;'}
+        if value in self.value_map:
+            self.form = "<" + category + ">" + \
+                self.value_map[value] + "</" + category + ">"
+        else:
+            self.form = "<" + category + "> " + value + " </" + category + ">"
 
 
+class NonTerminalToken:
+    def __init__(self, value, isbegin):
+        self.value = value
+        self.is_terminal = False
 
-                f.write('<' + 'identifier' + "> " +
-                        identifier1 + " </" + 'identifier' + '>\n')
-                f.write('<' + tokenClassDict[token[dotPosition]] + "> " +
-                        token[dotPosition] + " </" + tokenClassDict[token[dotPosition]] + '>\n')
-                f.write('<' + 'identifier' + "> " +
-                        identifier2 + " </" + 'identifier' + '>\n')
-                f.write('<' + tokenClassDict[token[semiColonPosition]] + "> " +
-                        token[semiColonPosition] + " </" + tokenClassDict[token[semiColonPosition]] + '>\n')
-
-            elif ';' in token:
-                semiColonPosition = token.find(';')
-                idVar = token[:semiColonPosition]
-                f.write('<' + 'identifier' + "> " +
-                        idVar + " </" + 'identifier' + '>\n')
-                f.write('<' + tokenClassDict[token[semiColonPosition]] + "> " +
-                        token[semiColonPosition] + " </" + tokenClassDict[token[semiColonPosition]] + '>\n')
-
-            elif '(' in token:
-                # print(token)
-                leftBracketPosition = token.find('(')
-                rightBracketPosition = token.find(')')
-                idVar = token[:leftBracketPosition]
-                f.write('<' + 'identifier' + "> " +
-                        idVar + " </" + 'identifier' + '>\n')
-                f.write('<' + tokenClassDict[token[leftBracketPosition]] + "> " +
-                        token[leftBracketPosition] + " </" + tokenClassDict[token[leftBracketPosition]] + '>\n')
-
-                f.write('<' + tokenClassDict[token[rightBracketPosition]] + "> " +
-                        token[rightBracketPosition] + " </" + tokenClassDict[token[rightBracketPosition]] + '>\n')
-
-            elif not token in tokenClassDict:
-                if token != '':
-                    f.write('<' + 'identifier' + "> " +
-                            token + " </" + 'identifier' + '>\n')
+        if isbegin:
+            self.form = '<' + value + '>'
+        else:
+            self.form = '</' + value + '>'
 
 
+class JackTokenizer:
+
+
+    def __init__(self, file_name):
+
+        self.tokens = []
+        self.codes = []
+        self.strings = []
+        self.index = 0
+        self.keywords = ['class', 'constructor', 'function',
+                         'method', 'field', 'static', 'var', 'int', 'char',
+                         'boolean', 'void', 'true', 'false', 'null', 'this',
+                         'let', 'do', 'if', 'else', 'while', 'return']
+        self.symbols = ['{', '}', '(', ')', '[', ']', '.', ',',
+                        ';', '+', '-', '*', '/', '&', '|', '<', '>', '=', '~']
+
+        if file_name[-5:] == ".jack":
+            self.file_name = file_name[:-5]
+        else:
+            print("the input file must be Xxx.jack")
+            exit(-1)
+
+        with open(file_name) as file:
+            multi_comments = False
+            for line in file:
+                current_line = line.strip()
+                if multi_comments:
+                    if current_line.find('*/') == -1:
+                        continue
+                    current_line = current_line[current_line.find('*/')+2:]
+                    multi_comments = False
+                    continue
+                if len(current_line) == 0 or current_line.startswith('//'):
+                    continue
+                if current_line.find('//') != -1:
+                    current_line = current_line.split('//')[0]
+                if current_line.find('/*') != -1:
+                    startMultiComment = current_line.find('/*')
+                    endMultiComment = current_line.find('*/')
+                    if endMultiComment == -1:
+                        multi_comments = True
+                        current_line = current_line[:startMultiComment]
+                    else:
+                        current_line = current_line[:startMultiComment] + \
+                            current_line[endMultiComment+2:]
+                self.codes.append((current_line.strip()))
+
+    def tokenize(self):
+        """"""
+        self.strings = []
+        self.index = 0
+        for code in self.codes:
+            if code.find('\"') != -1:
+                s = code.find('\"')
+                e = code.rfind('\"')
+                self.strings.append(code[s + 1:e])
+                code = code[:s] + code[e:]
+            tmp = code.split()
+            for x in tmp:
+                self.handle_code(x)
+
+    def handle_code(self, code):
+        if code[0] in self.symbols:
+            self.tokens.append(Token("symbol", code[0]))
+            if len(code) == 1:
+                return
+            self.handle_code(code[1:])
+        elif code[0] == '\"':
+            self.tokens.append(
+                Token("stringConstant", self.strings[self.index]))
+            self.index += 1
+            if len(code) == 1:
+                return
+            self.handle_code(code[1:])
+        elif code[0].isdecimal():
+            integer = code
+            for index, chars in enumerate(code[1:], 1):
+                if chars.isdecimal() == False:
+                    integer = code[:index]
+                    break
+            intInteger = int(integer)
+            if intInteger > 32767 or intInteger < 0:
+                print("the integer constant is out of range [0, 32767]")
+                exit(-1)
+            self.tokens.append(Token("integerConstant", integer))
+            if len(integer) == len(code):
+                return
+            self.handle_code(code[len(integer):])
+        else:
+            iskeyword = False
+            for keyword in self.keywords:
+                if code.find(keyword) == 0:
+                    self.tokens.append(Token("keyword", keyword))
+                    if len(keyword) == len(code):
+                        return
+                    self.handle_code(code[len(keyword):])
+                    iskeyword = True
+                    break
+
+            if iskeyword:
+                return
+            identifier = code
+            for i, s in enumerate(code):
+                if s in self.symbols:
+                    identifier = code[:i]
+                    break
+            self.tokens.append(Token("identifier", identifier))
+            if len(identifier) == len(code):
+                return
+            self.handle_code(code[len(identifier):])
+
+    def save_tokenfile(self):
+        with open(self.file_name+'TT.xml', 'w') as file:
+            file.write("<tokens>\n")
+            for token in self.tokens:
+                file.write(token.form+'\n')
+            file.write("</tokens>")
