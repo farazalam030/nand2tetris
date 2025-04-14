@@ -7,10 +7,8 @@ class Quiz {
         let answers = a;
         let options=o;
         return this;
-
-
     }
-
+/** */
    method void drawRect (int x, int y, boolean color, int size )
    {
 
@@ -18,13 +16,14 @@ class Quiz {
     do Screen.drawRectangle(x,y,x+size,y+size);
     return;
    }
-
+/** */
     method boolean askQuestion(int index) {
         var String userAnswer;
         var boolean isCorrect;
         var int optIndex;
         var int correctAnswer;
         // Display question
+        do drawRect(4,5,true,40);
         let optIndex=index*2;
         do Output.printString(questions[index]);
         do Output.println();
