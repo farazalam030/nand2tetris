@@ -4,12 +4,10 @@ class Token:
         self.value = value
         self.t = category
         self.is_terminal = True
-        if value == '<':
-            self.form = "<" + category + "> &lt; </" + category + ">"
-        elif value == '>':
-            self.form = "<" + category + "> &gt; </" + category + ">"
-        elif value == '&':
-            self.form = "<" + category + "> &amp; </" + category + ">"
+        self.value_map = {'<': '&lt;', '>': '&gt;', '&': '&amp;'}
+        if value in self.value_map:
+            self.form = "<" + category + ">" + \
+                self.value_map[value] + "</" + category + ">"
         else:
             self.form = "<" + category + "> " + value + " </" + category + ">"
 
@@ -38,12 +36,8 @@ class JackTokenizer:
                          'method', 'field', 'static', 'var', 'int', 'char',
                          'boolean', 'void', 'true', 'false', 'null', 'this',
                          'let', 'do', 'if', 'else', 'while', 'return']
-        self.keyword_dict = {'class': 'keyword', 'constructor': 'keyword', 'function': 'keyword',  'method': 'keyword', 'field': 'keyword', 'static': 'keyword', 'var': 'keyword', 'int': 'keyword', 'char': 'keyword',  'boolean': 'keyword',
-                             'void': 'keyword', 'true': 'keyword', 'false': 'keyword', 'null': 'keyword', 'this': 'keyword',  'let': 'keyword', 'do': 'keyword', 'if': 'keyword', 'else': 'keyword', 'while': 'keyword', 'return': 'keyword'}
         self.symbols = ['{', '}', '(', ')', '[', ']', '.', ',',
                         ';', '+', '-', '*', '/', '&', '|', '<', '>', '=', '~']
-        self.symbols_dict = {'{': 'symbol', '}': 'symbol', '(': 'symbol', ')': 'symbol', '[': 'symbol', ']': 'symbol', '.': 'symbol', ';': 'symbol', '+': 'symbol',
-                             '-': 'symbol', '*': 'symbol', '/': 'symbol', '&': 'symbol', '|': 'symbol', '<': 'symbol', '>': 'symbol', '=': 'symbol', '~': 'symbol', ',': 'symbol'}
 
         if file_name[-5:] == ".jack":
             self.file_name = file_name[:-5]
